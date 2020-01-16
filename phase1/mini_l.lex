@@ -3,6 +3,7 @@
 %}
 
 DIGIT [0-9]
+LETTER [a-zA-Z]
 
 %%
 "function" {printf("FUNCTION\n"); currPos += yyleng;}
@@ -58,7 +59,16 @@ DIGIT [0-9]
 
 {DIGIT}+ {printf("NUMBER %s\n", yytext); currPos += yyleng;}
 
-[ \t]+ {/*ignore*/ currPos += yyleng;}
+("_"[a-zA-Z0-9_]*)|({DIGIT}[a-zA-Z0-9_]*) {printf("Error at line %d, column %d: identifier \"%s\" must begin with a letter\n", currLine, currPos, yytext); exit(0);}
+
+([a-zA-Z0-9_]*"_") {printf("Error at line %d, column %d: identifier \"%s\" cannot end with an underscore\n", currLine, currPos, yytext); exit(0);}
+
+({LETTER}+[a-zA-Z0-9_]*) {printf("IDENT %s\n", yytext); currPos += yyleng;}
+
+[ \t]+ {/*ignore : whitespace */ currPos += yyleng;}
+
+"##".* {/*ignore : comments */ currLine++; currPos += yyleng;}
+
 "\n" {currLine++; currPos = 1;}
 
 . {printf("Error on line %d, column %d: unrecognized symbol: \"%s\"\n", currLine, currPos, yytext); exit(0);}
