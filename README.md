@@ -1,4 +1,5 @@
 # Compilers
+This course covers the fundamentals of compiler design, including lexical analysis, parsing, semantic analysis, compile-time memory organization, run-time memory organization, code generation, and compiler portability issues. Laboratory work involves a project and exercises covering various aspects of compilers. 
 
 ## Table of Contents
 - [Phase 1](#phase-1)
@@ -45,4 +46,11 @@ In the previous phases of the class project, you used the flex and bison tools t
 Full Instructions:
 https://www.cs.ucr.edu/~cxu009/teaching/CS152-winter20/webpages3/phase3_code_generator.html
 
+**How To Run:**
+```
+> cd cs 152
+> cd phase3
+```
+
 ## Dependencies
+Install [`flex`](https://github.com/westes/flex) and [`bison`](https://www.gnu.org/software/bison/)
