@@ -6,7 +6,7 @@ DIGIT [0-9]
 LETTER [a-zA-Z]
 
 %%
-"function" {printf("FUNCTION\n"); currPos += yyleng;}
+"function" {return("FUNCTION\n"); currPos += yyleng;}
 "beginparams" {printf("BEGIN_PARAMS\n"); currPos += yyleng;}
 "endparams" {printf("END_PARAMS\n"); currPos += yyleng;}
 "beginlocals" {printf("BEGIN_LOCALS\n"); currPos += yyleng;}
