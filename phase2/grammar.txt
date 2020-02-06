@@ -14,8 +14,12 @@ Terminals in all uppercase, productions in lowercase (with the exception of the 
 
 // DECLARATION
 
-declaration -> ident COLON INTEGER
-declaration -> ident COLON ARRAY left_brack NUMBER right_brack OF INTEGER
+Declaration : IdentifierList ':' INTEGER
+  | IdentifierList ':' ARRAY '[' number ']' OF INTEGER
+  ;
+IdentifierList : identifier
+  | IdentifierList ',' identifier
+  ;
 
 
 // STATEMENT
@@ -87,3 +91,5 @@ term -> SUB term
 
 var -> IDENT
 var -> IDENT left_brack exp right_brack
+
+yyLval.str_val = strdup(yytext); return IDENT;
