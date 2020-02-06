@@ -7,8 +7,17 @@
 
 %union {
   int int_val;
-  string* opt_val;
+  char* str_val;
 }
 
 %start input
-%token<str_val> ID
+%token<str_val> IDENT;
+
+%%
+Program: FunctionList {printf("Program -> FunctionList \n");}
+  | %empty {printf("Program -> %empty \n");}
+  ;
+
+FunctionList: FunctionList Function {}
+  | Function {}
+  ;
