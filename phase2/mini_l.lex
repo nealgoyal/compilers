@@ -1,5 +1,8 @@
 %{
-  int currLine = 1, currPos = 1;
+  #include "heading.h"
+  #include "tok.h"
+  int yyerror(char *s);
+  int yylineno = 1;
 %}
 
 DIGIT [0-9]
@@ -57,7 +60,7 @@ LETTER [a-zA-Z]
 "]" {printf("R_SQUARE_BRACKET\n"); currPos += yyleng;}
 ":=" {printf("ASSIGN\n"); currPos += yyleng;}
 
-{DIGIT}+ {yyLval = yytext; return NUMBER; currPos += yyleng;}
+{DIGIT}+ {yyLval.int_val = yytext; return NUMBER; currPos += yyleng;}
 
 ("_"[a-zA-Z0-9_]*)|({DIGIT}[a-zA-Z0-9_]*) {printf("Error at line %d, column %d: identifier \"%s\" must begin with a letter\n", currLine, currPos, yytext); exit(0);}
 
@@ -69,9 +72,9 @@ LETTER [a-zA-Z]
 
 "##".* {/*ignore : comments */ currLine++; currPos += yyleng;}
 
-"\n" {currLine++; currPos = 1;}
+"\n" {yylineno++;}
 
-. {printf("Error on line %d, column %d: unrecognized symbol: \"%s\"\n", currLine, currPos, yytext); exit(0);}
+. { std::cerr << "SCANNER "; yyerror(""); exit(1);}
 
 %%
 

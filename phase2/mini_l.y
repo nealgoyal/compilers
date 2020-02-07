@@ -25,7 +25,7 @@ FunctionList: FunctionList Function {printf("FunctionList -> FunctionList Functi
   | Function {printf("FunctionList -> Function \n");}
   ;
 
-Function: FUNCTION IDENT ";" FunctionParams FunctionLocals FunctionBody {printf(" Function -> FUNCTION IDENT ";" FunctionParams FunctionLocals FunctionBody \n");}
+Function: FUNCTION IDENT ";" FunctionParams FunctionLocals FunctionBody {printf("Function -> FUNCTION IDENT ; FunctionParams FunctionLocals FunctionBody \n");}
   ;
 FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS {printf("FunctionParams -> BEGIN_PARAMS DeclarationList END_PARAMS \n");}
   ;
@@ -44,4 +44,16 @@ IdentifierList: IDENT {printf("IdentifierList -> IDENT \n");}
   | IdentifierList "," IDENT {printf("IdentifierList -> IdentifierList , IDENT \n");}
   ;
 
-printf(" \n");
+%%
+int yyerror(string s) {
+  extern int yylineno;
+  extern char *yytext;
+
+  cerr << "ERROR " << s << " at symbol \"" << yytext;
+  cerr << "\" on line " << yylineno << endl;
+  exit(1);
+}
+
+int yyerror(char *s) {
+  return yyerror(string(s));
+}
