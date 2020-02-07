@@ -8,6 +8,7 @@
 %union {
   int int_val;
   char* str_val;
+  string* opt_val;
 }
 
 %start input

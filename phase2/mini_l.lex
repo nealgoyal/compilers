@@ -2,41 +2,41 @@
   #include "heading.h"
   #include "tok.h"
   int yyerror(char *s);
-  int yylineno = 1;
+  int currLine, currPos = 1;
 %}
 
 DIGIT [0-9]
 LETTER [a-zA-Z]
 
 %%
-"function" {return(FUNCTION); currPos += yyleng;}
-"beginparams" {return(BEGIN_PARAMS); currPos += yyleng;}
-"endparams" {return(END_PARAMS); currPos += yyleng;}
-"beginlocals" {return(BEGIN_LOCALS); currPos += yyleng;}
-"endlocals" {return(END_LOCALS); currPos += yyleng;}
-"beginbody" {return(BEGIN_BODY); currPos += yyleng;}
-"endbody" {return(END_BODY); currPos += yyleng;}
-"integer" {return(INTEGER); currPos += yyleng;}
-"array" {return(ARRAY); currPos += yyleng;}
-"of" {return(OF); currPos += yyleng;}
-"if" {return(IF); currPos += yyleng;}
-"then" {return(THEN); currPos += yyleng;}
-"endif" {return(ENDIF); currPos += yyleng;}
-"else" {return(ELSE); currPos += yyleng;}
-"while" {return(WHILE); currPos += yyleng;}
-"do" {return(DO); currPos += yyleng;}
-"for" {return(FOR); currPos += yyleng;}
-"beginloop" {return(BEGINLOOP); currPos += yyleng;}
-"endloop" {return(ENDLOOP); currPos += yyleng;}
-"continue" {return(CONTINUE); currPos += yyleng;}
-"read" {return(READ); currPos += yyleng;}
-"write" {return(WRITE); currPos += yyleng;}
-"and" {return(AND); currPos += yyleng;}
-"or" {return(OR); currPos += yyleng;}
-"not" {return(NOT); currPos += yyleng;}
-"true" {return(TRUE); currPos += yyleng;}
-"false" {return(FALSE); currPos += yyleng;}
-"return" {return(RETURN); currPos += yyleng;}
+"function" {yylval.str_val = strdup(yytext); currPos += yyleng; return FUNCTION;}
+"beginparams" {yylval.str_val = strdup(yytext); currPos += yyleng; return BEGIN_PARAMS;}
+"endparams" {yylval.str_val = strdup(yytext); currPos += yyleng; return END_PARAMS;}
+"beginlocals" {yylval.str_val = strdup(yytext); currPos += yyleng; return BEGIN_LOCALS;}
+"endlocals" {yylval.str_val = strdup(yytext); currPos += yyleng; return END_LOCALS;}
+"beginbody" {yylval.str_val = strdup(yytext); currPos += yyleng; return BEGIN_BODY;}
+"endbody" {yylval.str_val = strdup(yytext); currPos += yyleng; return END_BODY;}
+"integer" {yylval.str_val = strdup(yytext); currPos += yyleng; return INTEGER;}
+"array" {yylval.str_val = strdup(yytext); currPos += yyleng; return ARRAY;}
+"of" {yylval.str_val = strdup(yytext); currPos += yyleng; return OF;}
+"if" {yylval.str_val = strdup(yytext); currPos += yyleng; return IF;}
+"then" {yylval.str_val = strdup(yytext); currPos += yyleng; return THEN;}
+"endif" {yylval.str_val = strdup(yytext); currPos += yyleng; return ENDIF;}
+"else" {yylval.str_val = strdup(yytext); currPos += yyleng; return ELSE;}
+"while" {yylval.str_val = strdup(yytext); currPos += yyleng; return WHILE;}
+"do" {yylval.str_val = strdup(yytext); currPos += yyleng; return DO;}
+"for" {yylval.str_val = strdup(yytext); currPos += yyleng; return FOR;}
+"beginloop" {yylval.str_val = strdup(yytext); currPos += yyleng; return BEGINLOOP;}
+"endloop" {yylval.str_val = strdup(yytext); currPos += yyleng; return ENDLOOP;}
+"continue" {yylval.str_val = strdup(yytext); currPos += yyleng; return CONTINUE;}
+"read" {yylval.str_val = strdup(yytext); currPos += yyleng; return READ;}
+"write" {yylval.str_val = strdup(yytext); currPos += yyleng; return WRITE;}
+"and" {yylval.str_val = strdup(yytext); currPos += yyleng; return AND;}
+"or" {yylval.str_val = strdup(yytext); currPos += yyleng; return OR;}
+"not" {yylval.str_val = strdup(yytext); currPos += yyleng; return NOT;}
+"true" {yylval.str_val = strdup(yytext); currPos += yyleng; return TRUE;}
+"false" {yylval.str_val = strdup(yytext); currPos += yyleng; return FALSE;}
+"return" {yylval.str_val = strdup(yytext); currPos += yyleng; return RETURN;}
 
 "-" {return(SUB); currPos += yyleng;}
 "+" {return(ADD); currPos += yyleng;}
@@ -60,19 +60,19 @@ LETTER [a-zA-Z]
 "]" {return(R_SQUARE_BRACKET); currPos += yyleng;}
 ":=" {return ASSIGN; currPos += yyleng;}
 
-{DIGIT}+ {yyLval.int_val = yytext; return NUMBER; currPos += yyleng;}
+{DIGIT}+ {yylval.int_val = atoi(yytext); currPos += yyleng; return NUMBER;}
 
-("_"[a-zA-Z0-9_]*)|({DIGIT}[a-zA-Z0-9_]*) {printf("Error at line %d, column %d: identifier \"%s\" must begin with a letter\n", currLine, currPos, yytext); exit(0);}
+("_"[a-zA-Z0-9_]*)|({DIGIT}[a-zA-Z0-9_]*) {printf("Error at line %d, column %d: identifier \"%s\" must begin with a letter\n", currLine, currPos, yytext); exit(1);}
 
-([a-zA-Z0-9_]*"_") {printf("Error at line %d, column %d: identifier \"%s\" cannot end with an underscore\n", currLine, currPos, yytext); exit(0);}
+([a-zA-Z0-9_]*"_") {printf("Error at line %d, column %d: identifier \"%s\" cannot end with an underscore\n", currLine, currPos, yytext); exit(1);}
 
-({LETTER}+[a-zA-Z0-9_]*) {yyLval.str_val = strdup(yytext); return IDENT; currPos += yyleng;}
+({LETTER}+[a-zA-Z0-9_]*) {yylval.str_val = strdup(yytext); return IDENT;}
 
 [ \t]+ {/*ignore : whitespace */ currPos += yyleng;}
 
-"##".* {/*ignore : comments */ currLine++; currPos += yyleng;}
+"##".* {/*ignore : comments */ currLine++;currPos += yyleng;}
 
-"\n" {yylineno++;}
+"\n" {currLine++; currPos = 1;}
 
 . { std::cerr << "SCANNER "; yyerror(""); exit(1);}
 
