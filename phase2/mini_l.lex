@@ -45,7 +45,7 @@ LETTER [a-zA-Z]
 "%" {yylval.str_val = strdup("MOD"); currPos += yyleng; return MOD;}
 
 "==" {yylval.str_val = strdup("EQ"); currPos += yyleng; return EQ;}
-"<>>" {yylval.str_val = strdup("NEQ"); currPos += yyleng; return NEQ;}
+"<>" {yylval.str_val = strdup("NEQ"); currPos += yyleng; return NEQ;}
 "<" {yylval.str_val = strdup("LT"); currPos += yyleng; return LT;}
 ">" {yylval.str_val = strdup("GT"); currPos += yyleng; return GT;}
 "<=" {yylval.str_val = strdup("LTE"); currPos += yyleng; return LTE;}
