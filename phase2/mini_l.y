@@ -80,7 +80,7 @@ RelationExpr: Relations {printf("RelationExpr -> Relations\n");}
 Relations: Expression Comp Expression {printf("Relations -> Expression Comp Expression\n");}
   | TRUE {printf("Relations -> %s\n", $1);}
   | FALSE {printf("Relations -> %s\n", $1);}
-  | L_PAREN BoolExpr R_PAREN {printf(Relations -> %s BoolExpr %s\n", );}
+  | L_PAREN BoolExpr R_PAREN {printf("Relations -> %s BoolExpr %s\n", );}
   ;
 
 /* Comp */
