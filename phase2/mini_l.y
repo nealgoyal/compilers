@@ -8,6 +8,7 @@
 %union {
   int int_val;
   char* str_val;
+  string* opt_val;
 }
 
 %start input
@@ -81,3 +82,16 @@ Statement: Var ASSIGN Expression {printf("Statement -> Var %s Expression\n", $2)
 
 
 /* Var */
+%%
+int yyerror(string s) {
+  extern int currLine;
+  extern char *yytext;
+
+  cerr << "ERROR " << s << " at symbol \"" << yytext;
+  cerr << "\" on line " << yylineno << endl;
+  exit(1);
+}
+
+int yyerror(char *s) {
+  return yyerror(string(s));
+}

@@ -1,5 +1,8 @@
 %{
-  int currLine = 1, currPos = 1;
+  #include "heading.h"
+  #include "tok.h"
+  int yyerror(char *s);
+  int currLine, currPos = 1;
 %}
 
 DIGIT [0-9]
@@ -59,19 +62,19 @@ LETTER [a-zA-Z]
 
 {DIGIT}+ {yyLval.int_val = atoi(yytext); currPos += yyleng; return NUMBER;}
 
-("_"[a-zA-Z0-9_]*)|({DIGIT}[a-zA-Z0-9_]*) {printf("Error at line %d, column %d: identifier \"%s\" must begin with a letter\n", currLine, currPos, yytext); exit(0);}
+("_"[a-zA-Z0-9_]*)|({DIGIT}[a-zA-Z0-9_]*) {printf("Error at line %d, column %d: identifier \"%s\" must begin with a letter\n", currLine, currPos, yytext); exit(1);}
 
-([a-zA-Z0-9_]*"_") {printf("Error at line %d, column %d: identifier \"%s\" cannot end with an underscore\n", currLine, currPos, yytext); exit(0);}
+([a-zA-Z0-9_]*"_") {printf("Error at line %d, column %d: identifier \"%s\" cannot end with an underscore\n", currLine, currPos, yytext); exit(1);}
 
 ({LETTER}+[a-zA-Z0-9_]*) {yyLval.str_val = strdup(yytext); currPos += yyleng; return IDENT;}
 
 [ \t]+ {/*ignore : whitespace */ currPos += yyleng;}
 
-"##".* {/*ignore : comments */ currLine++; currPos += yyleng;}
+"##".* {/*ignore : comments */ currLine++;currPos += yyleng;}
 
 "\n" {currLine++; currPos = 1;}
 
-. {printf("Error on line %d, column %d: unrecognized symbol: \"%s\"\n", currLine, currPos, yytext); exit(0);}
+. { std::cerr << "SCANNER "; yyerror(""); exit(1);}
 
 %%
 
