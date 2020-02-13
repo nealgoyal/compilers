@@ -18,6 +18,7 @@
 
 
 %%
+/* Program */
 Program: FunctionList {printf("Program -> FunctionList \n");}
   | %empty {printf("Program -> %empty \n");}
   ;
@@ -25,7 +26,8 @@ FunctionList: FunctionList Function {printf("FunctionList -> FunctionList Functi
   | Function {printf("FunctionList -> Function \n");}
   ;
 
-Function: FUNCTION IDENT ";" FunctionParams FunctionLocals FunctionBody {printf(" Function -> FUNCTION IDENT ";" FunctionParams FunctionLocals FunctionBody \n");}
+/* Function */
+Function: FUNCTION IDENT SEMICOLON FunctionParams FunctionLocals FunctionBody {printf(" Function -> FUNCTION IDENT %s FunctionParams FunctionLocals FunctionBody \n", $3);}
   ;
 FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS {printf("FunctionParams -> BEGIN_PARAMS DeclarationList END_PARAMS \n");}
   ;
@@ -33,15 +35,49 @@ FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS {printf("FunctionLocals 
   ;
 FunctionBody: BEGIN_BODY DeclarationList END_BODY {printf("FunctionBody -> BEGIN_BODY DeclarationList END_BODY \n");}
   ;
-DeclarationList: DeclarationList Declaration ";" {printf("DeclarationList -> DeclarationList Declaration ; \n");}
-  | Declartion ";" {printf("DeclarationList -> Declaration ; \n");}
+DeclarationList: DeclarationList Declaration SEMICOLON {printf("DeclarationList -> DeclarationList Declaration %s \n", $3);}
+  | Declartion SEMICOLON {printf("DeclarationList -> Declaration ; \n", $2);}
   ;
 
-Declaration: IdentifierList ":" IDENT {printf("Declaration -> IdentifierList : IDENT \n");}
-  | IdentifierList ":" ARRAY "[" NUMBER "]" OF INTEGER {printf("Declaration -> IdentifierList : ARRAY [NUMBER] OF INTEGER \n");}
+/* Declaration */
+Declaration: IdentifierList COLON INTEGER {printf("Declaration -> IdentifierList %s INTEGER \n", $2);}
+  | IdentifierList COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER {printf("Declaration -> IdentifierList %s ARRAY %s NUMBER %s OF INTEGER \n", ($2, $4, $6));}
   ;
-IdentifierList: IDENT {printf("IdentifierList -> IDENT \n");}
-  | IdentifierList "," IDENT {printf("IdentifierList -> IdentifierList , IDENT \n");}
+IdentifierList: IDENT {printf("IdentifierList -> %s \n", $1);}
+  | IdentifierList COMMA IDENT {printf("IdentifierList -> IdentifierList %s %s \n", ($2, $3));}
   ;
 
-printf(" \n");
+/* Statement */
+Statement: Var ASSIGN Expression {printf("Statement -> Var %s Expression\n", $2);}
+  | IF BoolExpr THEN StatementList ENDIF {printf("Statement -> %s BoolExpr %s StatementList %s\n", ($1, $3, $5));}
+  | IF BoolExpr THEN StatementList ELSE StatementList ENDIF {printf("Statement -> %s BoolExpr %s StatementList %s StatementList %s\n", ($1, $3, $5, $7));}
+  | WHILE BoolExpr BEGINLOOP StatementList ENDLOOP {printf("Statement -> %s BoolExpr %s StatementList %s\n", ($1, $3, $5));}
+  | DO BEGINLOOP StatementList ENDLOOP WHILE BoolExpr {printf("Statement -> %s %s StatementList %s %s BoolExpr\n", ($1, $2, $4, $5));}
+  | FOR Var ASSIGN NUMBER SEMICOLON BoolExpr SEMICOLON Var ASSIGN Expression BEGINLOOP StatementList ENDLOOP {printf("Statement -> %s Var %s %s %s BoolExpr %s Var %s Expression %s StatementList %s\n", ($1, $3, $4, $5, $7, $9, $11, $13));}
+  | READ VarList {printf("Statement -> %s VarList\n", $1);}
+  | WRITE VarList {printf("Statement -> %s VarList\n", $1);}
+  | CONTINUE {printf("Statement -> %s\n", $1);}
+  | RETURN Expression {printf("Statement -> %s Expression\n", $1);}
+
+/* Bool-Expr */
+
+
+/* Relation_And_Expr */
+
+
+/* Relation_Expr */
+
+
+/* Comp */
+
+
+/* Expression */
+
+
+/* Multiplicative_Expr */
+
+
+/* Term */
+
+
+/* Var */
