@@ -6,64 +6,64 @@ DIGIT [0-9]
 LETTER [a-zA-Z]
 
 %%
-"function" {printf("FUNCTION\n"); currPos += yyleng;}
-"beginparams" {printf("BEGIN_PARAMS\n"); currPos += yyleng;}
-"endparams" {printf("END_PARAMS\n"); currPos += yyleng;}
-"beginlocals" {printf("BEGIN_LOCALS\n"); currPos += yyleng;}
-"endlocals" {printf("END_LOCALS\n"); currPos += yyleng;}
-"beginbody" {printf("BEGIN_BODY\n"); currPos += yyleng;}
-"endbody" {printf("END_BODY\n"); currPos += yyleng;}
-"integer" {printf("INTEGER\n"); currPos += yyleng;}
-"array" {printf("ARRAY\n"); currPos += yyleng;}
-"of" {printf("OF\n"); currPos += yyleng;}
-"if" {printf("IF\n"); currPos += yyleng;}
-"then" {printf("THEN\n"); currPos += yyleng;}
-"endif" {printf("ENDIF\n"); currPos += yyleng;}
-"else" {printf("ELSE\n"); currPos += yyleng;}
-"while" {printf("WHILE\n"); currPos += yyleng;}
-"do" {printf("DO\n"); currPos += yyleng;}
-"for" {printf("FOR\n"); currPos += yyleng;}
-"beginloop" {printf("BEGINLOOP\n"); currPos += yyleng;}
-"endloop" {printf("ENDLOOP\n"); currPos += yyleng;}
-"continue" {printf("CONTINUE\n"); currPos += yyleng;}
-"read" {printf("READ\n"); currPos += yyleng;}
-"write" {printf("WRITE\n"); currPos += yyleng;}
-"and" {printf("AND\n"); currPos += yyleng;}
-"or" {printf("OR\n"); currPos += yyleng;}
-"not" {printf("NOT\n"); currPos += yyleng;}
-"true" {printf("TRUE\n"); currPos += yyleng;}
-"false" {printf("FALSE\n"); currPos += yyleng;}
-"return" {printf("RETURN\n"); currPos += yyleng;}
+"function" {yylval.str_val = strdup("FUNCTION"); currPos += yyleng; return FUNCTION;}
+"beginparams" {yylval.str_val = strdup("BEGIN_PARAMS"); currPos += yyleng; return BEGIN_PARAMS;}
+"endparams" {yylval.str_val = strdup("END_PARAMS"); currPos += yyleng; return END_PARAMS;}
+"beginlocals" {yylval.str_val = strdup("BEGIN_LOCALS"); currPos += yyleng; return BEGIN_LOCALS;}
+"endlocals" {yylval.str_val = strdup("END_LOCALS"); currPos += yyleng; return END_LOCALS;}
+"beginbody" {yylval.str_val = strdup("BEGIN_BODY"); currPos += yyleng; return BEGIN_BODY;}
+"endbody" {yylval.str_val = strdup("END_BODY"); currPos += yyleng; return END_BODY;}
+"integer" {yylval.str_val = strdup("INTEGER"); currPos += yyleng; return INTEGER;}
+"array" {yylval.str_val = strdup("ARRAY"); currPos += yyleng; return ARRAY;}
+"of" {yylval.str_val = strdup("OF"); currPos += yyleng; return OF;}
+"if" {yylval.str_val = strdup("IF"); currPos += yyleng; return IF;}
+"then" {yylval.str_val = strdup("THEN"); currPos += yyleng; return THEN;}
+"endif" {yylval.str_val = strdup("ENDIF"); currPos += yyleng; return ENDIF;}
+"else" {yylval.str_val = strdup("ELSE"); currPos += yyleng; return ELSE;}
+"while" {yylval.str_val = strdup("WHILE"); currPos += yyleng; return WHILE;}
+"do" {yylval.str_val = strdup("DO"); currPos += yyleng; return DO;}
+"for" {yylval.str_val = strdup("FOR"); currPos += yyleng; return FOR;}
+"beginloop" {yylval.str_val = strdup("BEGINLOOP"); currPos += yyleng; return BEGINLOOP;}
+"endloop" {yylval.str_val = strdup("ENDLOOP"); currPos += yyleng; return ENDLOOP;}
+"continue" {yylval.str_val = strdup("CONTINUE"); currPos += yyleng; return CONTINUE;}
+"read" {yylval.str_val = strdup("READ"); currPos += yyleng; return READ;}
+"write" {yylval.str_val = strdup("WRITE"); currPos += yyleng; return WRITE;}
+"and" {yylval.str_val = strdup("AND"); currPos += yyleng; return AND;}
+"or" {yylval.str_val = strdup("OR"); currPos += yyleng; return OR;}
+"not" {yylval.str_val = strdup("NOT"); currPos += yyleng; return NOT;}
+"true" {yylval.str_val = strdup("TRUE"); currPos += yyleng; return TRUE;}
+"false" {yylval.str_val = strdup("FALSE"); currPos += yyleng; return FALSE;}
+"return" {yylval.str_val = strdup("RETURN"); currPos += yyleng; return RETURN;}
 
-"-" {printf("SUB\n"); currPos += yyleng;}
-"+" {printf("ADD\n"); currPos += yyleng;}
-"*" {printf("MULT\n"); currPos += yyleng;}
-"/" {printf("DIV\n"); currPos += yyleng;}
-"%" {printf("MOD\n"); currPos += yyleng;}
+"-" {yylval.str_val = strdup("SUB"); currPos += yyleng; return SUB;}
+"+" {yylval.str_val = strdup("ADD"); currPos += yyleng; return ADD;}
+"*" {yylval.str_val = strdup("MULT"); currPos += yyleng; return MULT;}
+"/" {yylval.str_val = strdup("DIV"); currPos += yyleng; return DIV;}
+"%" {yylval.str_val = strdup("MOD"); currPos += yyleng; return MOD;}
 
-"==" {printf("EQ\n"); currPos += yyleng;}
-"<>>" {printf("NEQ\n"); currPos += yyleng;}
-"<" {printf("LT\n"); currPos += yyleng;}
-">" {printf("GT\n"); currPos += yyleng;}
-"<=" {printf("LTE\n"); currPos += yyleng;}
-">=" {printf("GTE\n"); currPos += yyleng;}
+"==" {yylval.str_val = strdup("EQ"); currPos += yyleng; return EQ;}
+"<>>" {yylval.str_val = strdup("NEQ"); currPos += yyleng; return NEQ;}
+"<" {yylval.str_val = strdup("LT"); currPos += yyleng; return LT;}
+">" {yylval.str_val = strdup("GT"); currPos += yyleng; return GT;}
+"<=" {yylval.str_val = strdup("LTE"); currPos += yyleng; return LTE;}
+">=" {yylval.str_val = strdup("GTE"); currPos += yyleng; return GTE;}
 
-";" {printf("SEMICOLON\n"); currPos += yyleng;}
-":" {printf("COLON\n"); currPos += yyleng;}
-"," {printf("COMMA\n"); currPos += yyleng;}
-"(" {printf("L_PAREN\n"); currPos += yyleng;}
-")" {printf("R_PAREN\n"); currPos += yyleng;}
-"[" {printf("L_SQUARE_BRACKET\n"); currPos += yyleng;}
-"]" {printf("R_SQUARE_BRACKET\n"); currPos += yyleng;}
-":=" {printf("ASSIGN\n"); currPos += yyleng;}
+";" {yylval.str_val = strdup("SEMICOLON"); currPos += yyleng; return SEMICOLON;}
+":" {yylval.str_val = strdup("COLON"); currPos += yyleng; return COLON;}
+"," {yylval.str_val = strdup("COMMA"); currPos += yyleng; return COMMA;}
+"(" {yylval.str_val = strdup("L_PAREN"); currPos += yyleng; return L_PAREN;}
+")" {yylval.str_val = strdup("R_PAREN"); currPos += yyleng; return R_PAREN;}
+"[" {yylval.str_val = strdup("L_SQUARE_BRACKET"); currPos += yyleng; return L_SQUARE_BRACKET;}
+"]" {yylval.str_val = strdup("R_SQUARE_BRACKET"); currPos += yyleng; return R_SQUARE_BRACKET;}
+":=" {yylval.str_val = strdup("ASSIGN"); currPos += yyleng; return ASSIGN;}
 
-{DIGIT}+ {yyLval = yytext; return NUMBER; currPos += yyleng;}
+{DIGIT}+ {yyLval.int_val = atoi(yytext); currPos += yyleng; return NUMBER;}
 
 ("_"[a-zA-Z0-9_]*)|({DIGIT}[a-zA-Z0-9_]*) {printf("Error at line %d, column %d: identifier \"%s\" must begin with a letter\n", currLine, currPos, yytext); exit(0);}
 
 ([a-zA-Z0-9_]*"_") {printf("Error at line %d, column %d: identifier \"%s\" cannot end with an underscore\n", currLine, currPos, yytext); exit(0);}
 
-({LETTER}+[a-zA-Z0-9_]*) {yyLval.str_val = strdup(yytext); return IDENT; currPos += yyleng;}
+({LETTER}+[a-zA-Z0-9_]*) {yyLval.str_val = strdup(yytext); currPos += yyleng; return IDENT;}
 
 [ \t]+ {/*ignore : whitespace */ currPos += yyleng;}
 
