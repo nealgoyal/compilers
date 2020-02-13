@@ -59,29 +59,62 @@ Statement: Var ASSIGN Expression {printf("Statement -> Var %s Expression\n", $2)
   | WRITE VarList {printf("Statement -> %s VarList\n", $1);}
   | CONTINUE {printf("Statement -> %s\n", $1);}
   | RETURN Expression {printf("Statement -> %s Expression\n", $1);}
+  ;
+StatementList: Statement SEMICOLON {printf("StatementList -> Statement %s\n", $2);}
+  | StatementList Statement SEMICOLON {printf("StatementList -> StatementList Statement %s\n", $3);}
+  ;
 
 /* Bool-Expr */
-
-
+BoolExpr: BoolExpr OR RelationAndExpr {printf("BoolExpr -> BoolExpr %s RelationAndExpr\n", $2);}
+  | RelationAndExpr {printf("BoolExpr -> RelationAndExpr\n");}
+  ;
 /* Relation_And_Expr */
-
+RelationAndExpr: RelationAndExpr AND RelationExpr {printf("RelationAndExpr -> RelationAndExpr %s RelationExpr\n", $2);}
+  | RelationExpr {printf("RelationAndExpr -> RelationExpr\n");}
+  ;
 
 /* Relation_Expr */
-
+RelationExpr: Relations {printf("RelationExpr -> Relations\n");}
+  | NOT Relations {printf("RelationExpr -> %s Relations\n", $1);}
+  ;
+Relations: Expression Comp Expression {printf("Relations -> Expression Comp Expression\n");}
+  | TRUE {printf("Relations -> %s\n", $1);}
+  | FALSE {printf("Relations -> %s\n", $1);}
+  | L_PAREN BoolExpr R_PAREN {printf(Relations -> %s BoolExpr %s\n", );}
+  ;
 
 /* Comp */
-
+Comp: EQ {printf("Comp -> %s\n", $1);}
+  | NEQ {printf("Comp -> %s\n", $1);}
+  | LT {printf("Comp -> %s\n", $1);}
+  | GT {printf("Comp -> %s\n", $1);}
+  | LTE {printf("Comp -> %s\n", $1);}
+  | GTE {printf("Comp -> %s\n", $1);}
+  ;
 
 /* Expression */
-
+Expression: Expression ADD MultiplicativeExpr {printf("Expression -> Expression %s MultiplicativeExpr\n", $2);}
+  | Expression SUB MultiplicativeExpr {printf("Expression -> Expression %s MultiplicativeExpr\n", $2);}
+  | MultiplicativeExpr {printf("Expression -> MultiplicativeExpr\n");}
+  ;
 
 /* Multiplicative_Expr */
-
+MultiplicativeExpr: MultiplicativeExpr MULT Term {printf("MultiplicativeExpr -> MultiplicativeExpr %s Term\n", $2);}
+  | MultiplicativeExpr DIV Term {printf("MultiplicativeExpr -> MultiplicativeExpr %s Term\n", $2);}
+  | MultiplicativeExpr MOD Term {printf("MultiplicativeExpr -> MultiplicativeExpr %s Term\n", $2);}
+  | Term {printf("MultiplicativeExpr -> Term\n");}
+  ;
 
 /* Term */
 
 
 /* Var */
+Var: IDENT {printf("Var -> %s\n", $1);}
+  | IDENT L_SQUARE_BRACKET Expression R_SQUARE_BRACKET {printf("Var -> %s %s Expression %s\n", ($1, $2, $4));}
+
+VarList: Var {printf("VarList -> Var\n");}
+  | VarList Var COMMA {printf("VarList -> VarList Var %s\n", $3);}
+
 %%
 int yyerror(string s) {
   extern int currLine;
