@@ -11,12 +11,60 @@
   string* opt_val;
 }
 
-%start input
-%token<str_val> FUNCTION, IDENT;
-%token<str_val> BEGIN_PARAMS, END_PARAMS, BEGIN_LOCALS, END_LOCALS, BEGIN_BODY, END_BODY;
-%token<int_val> NUMBER;
-%token<str_val> ARRAY, OF, INTEGER;
+%start Program
+%token<str_val> FUNCTION;
+%token<str_val> BEGIN_PARAMS;
+%token<str_val> END_PARAMS;
+%token<str_val> BEGIN_LOCALS;
+%token<str_val> END_LOCALS;
+%token<str_val> BEGIN_BODY;
+%token<str_val> END_BODY;
+%token <str_val> INTEGER;
+%token<str_val> ARRAY;
+%token<str_val> OF;
+%token <str_val> IF;
+%token<str_val> THEN;
+%token <str_val> ENDIF;
+%token <str_val> ELSE;
+%token <str_val> WHILE;
+%token <str_val> DO;
+%token <str_val> FOR;
+%token <str_val> BEGINLOOP;
+%token <str_val> ENDLOOP;
+%token <str_val> CONTINUE;
+%token <str_val> READ;
+%token <str_val> WRITE;
+%token<str_val> AND;
+%token <str_val> OR;
+%token <str_val> NOT;
+%token <str_val> TRUE;
+%token <str_val> FALSE;
+%token <str_val> RETURN;
 
+%token <str_val> SUB;
+%token <str_val> ADD;
+%token <str_val> MULT;
+%token <str_val> DIV;
+%token <str_val> MOD;
+
+%token <str_val> EQ;
+%token <str_val> NEQ;
+%token <str_val> LT;
+%token <str_val> GT;
+%token <str_val> LTE;
+%token <str_val> GTE;
+
+%token <str_val> IDENT;
+%token <str_val> NUMBER;
+
+%token <str_val> SEMICOLON;
+%token <str_val> COLON;
+%token <str_val> COMMA;
+%token <str_val> L_PAREN;
+%token <str_val> R_PAREN;
+%token <str_val> L_SQUARE_BRACKET;
+%token <str_val> R_SQUARE_BRACKET;
+%token <str_val> ASSIGN;
 
 %%
 /* Program */
@@ -37,7 +85,7 @@ FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS {printf("FunctionLocals 
 FunctionBody: BEGIN_BODY DeclarationList END_BODY {printf("FunctionBody -> BEGIN_BODY DeclarationList END_BODY \n");}
   ;
 DeclarationList: DeclarationList Declaration SEMICOLON {printf("DeclarationList -> DeclarationList Declaration %s \n", $3);}
-  | Declartion SEMICOLON {printf("DeclarationList -> Declaration ; \n", $2);}
+  | Declaration SEMICOLON {printf("DeclarationList -> Declaration ; \n", $2);}
   ;
 
 /* Declaration */
@@ -128,10 +176,11 @@ VarList: Var {printf("VarList -> Var\n");}
 %%
 int yyerror(string s) {
   extern int currLine;
+  extern int currPos;
   extern char *yytext;
 
   cerr << "ERROR " << s << " at symbol \"" << yytext;
-  cerr << "\" on line " << yylineno << endl;
+  cerr << "\" on line " << currLine << ", column " << currPos << endl;
   exit(1);
 }
 
