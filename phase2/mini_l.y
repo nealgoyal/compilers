@@ -54,7 +54,7 @@ Statement: Var ASSIGN Expression {printf("Statement -> Var %s Expression\n", $2)
   | IF BoolExpr THEN StatementList ELSE StatementList ENDIF {printf("Statement -> %s BoolExpr %s StatementList %s StatementList %s\n", ($1, $3, $5, $7));}
   | WHILE BoolExpr BEGINLOOP StatementList ENDLOOP {printf("Statement -> %s BoolExpr %s StatementList %s\n", ($1, $3, $5));}
   | DO BEGINLOOP StatementList ENDLOOP WHILE BoolExpr {printf("Statement -> %s %s StatementList %s %s BoolExpr\n", ($1, $2, $4, $5));}
-  | FOR Var ASSIGN NUMBER SEMICOLON BoolExpr SEMICOLON Var ASSIGN Expression BEGINLOOP StatementList ENDLOOP {printf("Statement -> %s Var %s %s %s BoolExpr %s Var %s Expression %s StatementList %s\n", ($1, $3, $4, $5, $7, $9, $11, $13));}
+  | FOR Var ASSIGN NUMBER SEMICOLON BoolExpr SEMICOLON Var ASSIGN Expression BEGINLOOP StatementList ENDLOOP {printf("Statement -> %s Var %s NUMBER %s BoolExpr %s Var %s Expression %s StatementList %s\n", ($1, $3, $5, $7, $9, $11, $13));}
   | READ VarList {printf("Statement -> %s VarList\n", $1);}
   | WRITE VarList {printf("Statement -> %s VarList\n", $1);}
   | CONTINUE {printf("Statement -> %s\n", $1);}
@@ -97,6 +97,8 @@ Expression: Expression ADD MultiplicativeExpr {printf("Expression -> Expression 
   | Expression SUB MultiplicativeExpr {printf("Expression -> Expression %s MultiplicativeExpr\n", $2);}
   | MultiplicativeExpr {printf("Expression -> MultiplicativeExpr\n");}
   ;
+ExpressionList: ExpressionList Expression COMMA {printf("ExpressionList -> ExpressionList Expression %s\n", $3);}
+  | Expression {printf("ExpressionList -> Expression\n");}
 
 /* Multiplicative_Expr */
 MultiplicativeExpr: MultiplicativeExpr MULT Term {printf("MultiplicativeExpr -> MultiplicativeExpr %s Term\n", $2);}
@@ -106,7 +108,15 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term {printf("MultiplicativeExpr -> 
   ;
 
 /* Term */
-
+Term: Var {printf("Term -> Var\n");}
+  | NUMBER {printf("Term -> NUMBER\n");}
+  | L_PAREN Expression R_PAREN {printf("Term -> %s Expression %s\n", ($1, $3));}
+  | SUB Var {printf("Term -> %s Var\n", $1);}
+  | SUB NUMBER {printf("Term -> %s NUMBER\n", $1);}
+  | SUB L_PAREN Expression R_PAREN {printf("Term -> %s %s Expression %s\n", ($1, $2, $4));}
+  | IDENT L_PAREN ExpressionList R_PAREN {printf("Term -> %s %s ExpressionList %s\n", ($1, $2, $4));}
+  | IDENT L_PAREN R_PAREN {printf("Term -> %s %s %s\n", ($1, $2, $3));}
+  ;
 
 /* Var */
 Var: IDENT {printf("Var -> %s\n", $1);}
