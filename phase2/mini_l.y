@@ -2,6 +2,7 @@
   #include "stdio.h"
   #include "heading.h"
   int yyeror(char *s);
+  int yyerror(string s);
   int yylex(void);
 %}
 

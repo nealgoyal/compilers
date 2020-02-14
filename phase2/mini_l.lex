@@ -1,7 +1,7 @@
 %{
   #include "heading.h"
   #include "tok.h"
-  int yyerror(char *s);
+  extern int yyerror(char *s);
   int currLine, currPos = 1;
 %}
 
@@ -60,13 +60,13 @@ LETTER [a-zA-Z]
 "]" {yylval.str_val = strdup("R_SQUARE_BRACKET"); currPos += yyleng; return R_SQUARE_BRACKET;}
 ":=" {yylval.str_val = strdup("ASSIGN"); currPos += yyleng; return ASSIGN;}
 
-{DIGIT}+ {yyLval.int_val = atoi(yytext); currPos += yyleng; return NUMBER;}
+{DIGIT}+ {yylval.int_val = atoi(yytext); currPos += yyleng; return NUMBER;}
 
 ("_"[a-zA-Z0-9_]*)|({DIGIT}[a-zA-Z0-9_]*) {printf("Error at line %d, column %d: identifier \"%s\" must begin with a letter\n", currLine, currPos, yytext); exit(1);}
 
 ([a-zA-Z0-9_]*"_") {printf("Error at line %d, column %d: identifier \"%s\" cannot end with an underscore\n", currLine, currPos, yytext); exit(1);}
 
-({LETTER}+[a-zA-Z0-9_]*) {yyLval.str_val = strdup(yytext); currPos += yyleng; return IDENT;}
+({LETTER}+[a-zA-Z0-9_]*) {yylval.str_val = strdup(yytext); currPos += yyleng; return IDENT;}
 
 [ \t]+ {/*ignore : whitespace */ currPos += yyleng;}
 
