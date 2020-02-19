@@ -80,10 +80,13 @@ FunctionList: FunctionList Function {printf("FunctionList -> FunctionList Functi
 Function: FUNCTION IDENT SEMICOLON FunctionParams FunctionLocals FunctionBody {printf(" Function -> FUNCTION IDENT %s FunctionParams FunctionLocals FunctionBody \n", $3);}
   ;
 FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS {printf("FunctionParams -> BEGIN_PARAMS DeclarationList END_PARAMS \n");}
+  | BEGIN_PARAMS END_PARAMS {printf("FunctionParams -> BEGIN_PARAMS END_PARAMS \n");}
   ;
-FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS {printf("FunctionLocals -> BEGIN_LOCALS DeclarationList END_LOCALS \n");} 
+FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS {printf("FunctionLocals -> BEGIN_LOCALS DeclarationList END_LOCALS \n");}
+  | BEGIN_LOCALS END_LOCALS {printf("FunctionLocals -> BEGIN_LOCALS END_LOCALS \n");}
   ;
 FunctionBody: BEGIN_BODY DeclarationList END_BODY {printf("FunctionBody -> BEGIN_BODY DeclarationList END_BODY \n");}
+  | BEGIN_BODY END_BODY {printf("FunctionBody -> BEGIN_BODY END_BODY \n");}
   ;
 DeclarationList: DeclarationList Declaration SEMICOLON {printf("DeclarationList -> DeclarationList Declaration %s \n", $3);}
   | Declaration SEMICOLON {printf("DeclarationList -> Declaration ; \n", $2);}

@@ -5,8 +5,8 @@ OBJS	= bison.o lex.o main.o
 CC	= g++
 CFLAGS	= -g -Wall -ansi -pedantic
 
-mini_l:		$(OBJS)
-		$(CC) $(CFLAGS) $(OBJS) -o mini_l -lfl
+parser:		$(OBJS)
+		$(CC) $(CFLAGS) $(OBJS) -o parser -lfl
 
 lex.o:		lex.c
 		$(CC) $(CFLAGS) -c lex.c -o lex.o
