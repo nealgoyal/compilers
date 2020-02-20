@@ -85,7 +85,7 @@ FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS {printf("FunctionParams 
 FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS {printf("FunctionLocals -> BEGIN_LOCALS DeclarationList END_LOCALS \n");}
   | BEGIN_LOCALS END_LOCALS {printf("FunctionLocals -> BEGIN_LOCALS END_LOCALS \n");}
   ;
-FunctionBody: BEGIN_BODY DeclarationList END_BODY {printf("FunctionBody -> BEGIN_BODY DeclarationList END_BODY \n");}
+FunctionBody: BEGIN_BODY Statement END_BODY {printf("FunctionBody -> BEGIN_BODY DeclarationList END_BODY \n");}
   | BEGIN_BODY END_BODY {printf("FunctionBody -> BEGIN_BODY END_BODY \n");}
   ;
 DeclarationList: DeclarationList Declaration SEMICOLON {printf("DeclarationList -> DeclarationList Declaration %s \n", $3);}
@@ -96,8 +96,10 @@ DeclarationList: DeclarationList Declaration SEMICOLON {printf("DeclarationList 
 Declaration: IdentifierList COLON INTEGER {printf("Declaration -> IdentifierList %s INTEGER \n", $2);}
   | IdentifierList COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER {printf("Declaration -> IdentifierList %s ARRAY %s NUMBER %s OF INTEGER \n", ($2, $4, $6));}
   ;
-IdentifierList: IDENT {printf("IdentifierList -> %s \n", $1);}
-  | IdentifierList COMMA IDENT {printf("IdentifierList -> IdentifierList %s %s \n", ($2, $3));}
+IdentifierList: Identifier {printf("IdentifierList -> Identifier \n");}
+  | IdentifierList COMMA Identifier {printf("IdentifierList -> IdentifierList %s Identifier \n", $2);}
+  ;
+Identifier: IDENT {printf("Identifier -> %s \n", $1);}
   ;
 
 /* Statement */
@@ -151,6 +153,7 @@ Expression: Expression ADD MultiplicativeExpr {printf("Expression -> Expression 
   ;
 ExpressionList: ExpressionList Expression COMMA {printf("ExpressionList -> ExpressionList Expression %s\n", $3);}
   | Expression {printf("ExpressionList -> Expression\n");}
+  ;
 
 /* Multiplicative_Expr */
 MultiplicativeExpr: MultiplicativeExpr MULT Term {printf("MultiplicativeExpr -> MultiplicativeExpr %s Term\n", $2);}
@@ -171,11 +174,13 @@ Term: Var {printf("Term -> Var\n");}
   ;
 
 /* Var */
-Var: IDENT {printf("Var -> %s\n", $1);}
-  | IDENT L_SQUARE_BRACKET Expression R_SQUARE_BRACKET {printf("Var -> %s %s Expression %s\n", ($1, $2, $4));}
+Var: Identifier {printf("Var -> Identifier\n");}
+  | Identifier L_SQUARE_BRACKET Expression R_SQUARE_BRACKET {printf("Var -> Identifier %s Expression %s\n", ($2, $4));}
+  ;
 
 VarList: Var {printf("VarList -> Var\n");}
   | VarList Var COMMA {printf("VarList -> VarList Var %s\n", $3);}
+  ;
 
 %%
 int yyerror(string s) {
