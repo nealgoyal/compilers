@@ -1,12 +1,7 @@
-mini-l:
-	bison -v -d --file-prefix=y mini_l.y
+make:
+	bison -v -d --file-prefix=mini_l mini_l.y
 	flex mini_l.lex
-	gcc -o parser y.tab.c lex.yy.c -lfl
+	g++ -o parser mini_l.tab.c lex.yy.c -lfl
 
-clean: 
-	-rm y.tab.c
-	-rm y.tab.h
-	-rm y.output
-	-rm lex.yy.c
-	-rm lexer
-	-rm parser
+clean:
+	rm -rf mini_l.output mini_l.tab.* parser
