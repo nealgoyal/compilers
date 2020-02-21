@@ -78,7 +78,7 @@ FunctionList: FunctionList Function {printf("FunctionList -> FunctionList Functi
   ;
 
 /* Function */
-Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBody {printf(" Function -> FUNCTION Identifier ; FunctionParams FunctionLocals FunctionBody \n");}
+Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBody {printf("Function -> FUNCTION Identifier ; FunctionParams FunctionLocals FunctionBody \n");}
   ;
 FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS {printf("FunctionParams -> BEGIN_PARAMS DeclarationList END_PARAMS \n");}
   | BEGIN_PARAMS END_PARAMS {printf("FunctionParams -> BEGIN_PARAMS END_PARAMS \n");}
