@@ -166,12 +166,12 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term {printf("MultiplicativeExpr -> 
 
 /* Term */
 Term: TermInner
-  | SUB TermInner {printf("Term -> SUB TermInner\n");}
+  | SUB TermInner {printf("Term -> - TermInner\n");}
   | Identifier L_PAREN ExpressionList R_PAREN {printf("Term -> Identifier ( ExpressionList )\n");}
   ;
-TermInner: Var {printf("Term -> Var\n");}
-  | NUMBER {printf("Term -> %s\n", $1);}
-  | L_PAREN Expression R_PAREN {printf("Term -> ( Expression )\n");}
+TermInner: Var {printf("TermInner -> Var\n");}
+  | NUMBER {printf("TermInner -> %s\n", $1);}
+  | L_PAREN Expression R_PAREN {printf("TermInner -> ( Expression )\n");}
   ;
 
 /* Var */
