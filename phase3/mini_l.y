@@ -258,11 +258,11 @@ Relations: Expression Comp Expression
     }
   | TRUE
     {
-
+		$$.value = "1"
     }
   | FALSE
     {
-
+		$$.value = "0"
     }
   | L_PAREN BoolExpr R_PAREN
     {
