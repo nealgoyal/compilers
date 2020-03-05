@@ -61,7 +61,7 @@ LETTER [a-zA-Z]
 "]"               {currPos += yyleng; return R_SQUARE_BRACKET;}
 ":="              {currPos += yyleng; return ASSIGN;}
 
-{DIGIT}+ {yylval.str_val = strdup(yytext); currPos += yyleng; return NUMBER;}
+{DIGIT}+ {yylval.int_val = atoi(yytext); currPos += yyleng; return NUMBER;}
 
 ("_"[a-zA-Z0-9_]*)|({DIGIT}[a-zA-Z0-9_]*) {printf("Error at line %d, column %d: identifier \"%s\" must begin with a letter\n", currLine, currPos, yytext); exit(1);}
 
