@@ -81,12 +81,7 @@ Program: FunctionList
     {
 
     }
-  | %empty
-    {
-      nonTerm n;
-      n.ret_name = "";
-      $$ = n;
-    }
+  | %empty {nonTerm n; n.ret_name = ""; $$ = n;}
   ;
 FunctionList: FunctionList Function
     {
@@ -251,21 +246,27 @@ RelationExpr: Relations
   ;
 Relations: Expression Comp Expression
     {
+      nonTerm n;
       string temp_var = makeTemp();
       stringstream ss;
       ss << $1.code << "\n" << $3.code;
       ss << ". " << temp_var;
       ss << $2.value << " " << temp_var << ", " << $1.ret_name << ", " << $3.ret_name;
-      $$.code = ss.str();
-      $$.ret_name = temp_var;
+      n.code = ss.str();
+      n.ret_name = temp_var;
+      $$ = n;
     }
   | TRUE
     {
-		$$.value = "1"
+      nonTerm n;
+		  n.value = "1";
+      $$ = n;
     }
   | FALSE
     {
-		$$.value = "0"
+      nonTerm n;
+		  n.value = "0";
+      $$ = n;
     }
   | L_PAREN BoolExpr R_PAREN
     {
@@ -274,12 +275,12 @@ Relations: Expression Comp Expression
   ;
 
 /* Comp */
-Comp: EQ {$$.value = "==";}
-  | NEQ {$$.value = "<>";}
-  | LT {$$.value = "<";}
-  | GT {$$.value = ">";}
-  | LTE {$$.value = "<=";}
-  | GTE {$$.value = ">=";}
+Comp: EQ {nonTerm n; n.value = "=="; $$ = n;}
+  | NEQ {nonTerm n; n.value = "<>"; $$ = n;}
+  | LT {nonTerm n; n.value = "<"; $$ = n;}
+  | GT {nonTerm n; n.value = ">"; $$ = n;}
+  | LTE {nonTerm n; n.value = "<="; $$ = n;}
+  | GTE {nonTerm n; n.value = ">="; $$ = n;}
   ;
 
 /* Expression */
@@ -304,10 +305,7 @@ ExpressionList: ExpressionList COMMA Expression
     {
 
     }
-  | %empty
-    {
-
-    }
+  | %empty {nonTerm n; n.ret_name = ""; $$ = n;}
   ;
 
 /* Multiplicative_Expr */
