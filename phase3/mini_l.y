@@ -256,18 +256,8 @@ Relations: Expression Comp Expression
       n.ret_name = temp_var;
       $$ = n;
     }
-  | TRUE
-    {
-      nonTerm n;
-		  n.value = "1";
-      $$ = n;
-    }
-  | FALSE
-    {
-      nonTerm n;
-		  n.value = "0";
-      $$ = n;
-    }
+  | TRUE {nonTerm n; n.value = "1"; $$ = n;}
+  | FALSE {nonTerm n; n.value = "0"; $$ = n;}
   | L_PAREN BoolExpr R_PAREN
     {
 
@@ -356,11 +346,23 @@ TermInner: Var
   ;
 
 /* Var */
-Var: Identifier {}
-  | Identifier L_SQUARE_BRACKET Expression R_SQUARE_BRACKET {}
+Var: Identifier
+    {
+
+    }
+  | Identifier L_SQUARE_BRACKET Expression R_SQUARE_BRACKET
+    {
+
+    }
   ;
-VarList: Var {}
-  | Var COMMA VarList {}
+VarList: Var
+    {
+
+    }
+  | Var COMMA VarList
+    {
+      
+    }
   ;
 
 %%
