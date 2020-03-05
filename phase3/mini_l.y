@@ -76,67 +76,175 @@
 
 %%
 /* Program */
-Program: FunctionList {}
-  | %empty {}
+Program: FunctionList
+    {
+
+    }
+  | %empty
+    {
+
+    }
   ;
-FunctionList: FunctionList Function {}
-  | Function {}
+FunctionList: FunctionList Function
+    {
+
+    }
+  | Function
+    {
+
+    }
   ;
 
 /* Function */
-Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBody {}
+Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBody
+    {
+
+    }
   ;
-FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS {}
-  | BEGIN_PARAMS END_PARAMS {}
+FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
+    {
+
+    }
+  | BEGIN_PARAMS END_PARAMS
+    {
+
+    }
   ;
-FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS {}
-  | BEGIN_LOCALS END_LOCALS {}
+FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS
+    {
+
+    }
+  | BEGIN_LOCALS END_LOCALS
+    {
+
+    }
   ;
-FunctionBody: BEGIN_BODY StatementList END_BODY {}
-  | BEGIN_BODY END_BODY {}
+FunctionBody: BEGIN_BODY StatementList END_BODY
+    {
+
+    }
+  | BEGIN_BODY END_BODY
+    {
+
+    }
   ;
-DeclarationList: DeclarationList Declaration SEMICOLON {}
-  | Declaration SEMICOLON {}
+DeclarationList: DeclarationList Declaration SEMICOLON
+    {
+
+    }
+  | Declaration SEMICOLON
+    {
+
+    }
   ;
 
 /* Declaration */
-Declaration: IdentifierList COLON INTEGER {}
-  | IdentifierList COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER {}
+Declaration: IdentifierList COLON INTEGER
+    {
+
+    }
+  | IdentifierList COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
+    {
+
+    }
   ;
-IdentifierList: Identifier {}
-  | IdentifierList COMMA Identifier {}
+IdentifierList: Identifier
+    {
+
+    }
+  | IdentifierList COMMA Identifier
+    {
+
+    }
   ;
-Identifier: IDENT {}
+Identifier: IDENT
+    {
+
+    }
   ;
 
 /* Statement */
-Statement: Var ASSIGN Expression {}
-  | IF BoolExpr THEN StatementList ENDIF {}
-  | IF BoolExpr THEN StatementList ELSE StatementList ENDIF {}
-  | WHILE BoolExpr BEGINLOOP StatementList ENDLOOP {}
-  | DO BEGINLOOP StatementList ENDLOOP WHILE BoolExpr {}
-  | FOR Var ASSIGN NUMBER SEMICOLON BoolExpr SEMICOLON Var ASSIGN Expression BEGINLOOP StatementList ENDLOOP {}
-  | READ VarList {}
-  | WRITE VarList {}
-  | CONTINUE {}
-  | RETURN Expression {}
+Statement: Var ASSIGN Expression
+    {
+
+    }
+  | IF BoolExpr THEN StatementList ENDIF
+    {
+
+    }
+  | IF BoolExpr THEN StatementList ELSE StatementList ENDIF
+    {
+
+    }
+  | WHILE BoolExpr BEGINLOOP StatementList ENDLOOP
+    {
+
+    }
+  | DO BEGINLOOP StatementList ENDLOOP WHILE BoolExpr
+    {
+
+    }
+  | FOR Var ASSIGN NUMBER SEMICOLON BoolExpr SEMICOLON Var ASSIGN Expression BEGINLOOP StatementList ENDLOOP
+    {
+
+    }
+  | READ VarList
+    {
+
+    }
+  | WRITE VarList
+    {
+
+    }
+  | CONTINUE
+    {
+
+    }
+  | RETURN Expression
+    {
+
+    }
   ;
-StatementList: Statement SEMICOLON {}
-  | StatementList Statement SEMICOLON {}
+StatementList: Statement SEMICOLON
+    {
+
+    }
+  | StatementList Statement SEMICOLON
+    {
+
+    }
   ;
 
 /* Bool-Expr */
-BoolExpr: BoolExpr OR RelationAndExpr {}
-  | RelationAndExpr {}
+BoolExpr: BoolExpr OR RelationAndExpr
+    {
+
+    }
+  | RelationAndExpr
+    {
+
+    }
   ;
 /* Relation_And_Expr */
-RelationAndExpr: RelationAndExpr AND RelationExpr {}
-  | RelationExpr {}
+RelationAndExpr: RelationAndExpr AND RelationExpr
+    {
+
+    }
+  | RelationExpr
+    {
+
+    }
   ;
 
 /* Relation_Expr */
-RelationExpr: Relations {}
-  | NOT Relations {}
+RelationExpr: Relations
+    {
+
+    }
+  | NOT Relations
+    {
+
+    }
   ;
 Relations: Expression Comp Expression
     {
@@ -172,30 +280,78 @@ Comp: EQ {$$.value = "==";}
   ;
 
 /* Expression */
-Expression: Expression ADD MultiplicativeExpr {}
-  | Expression SUB MultiplicativeExpr {}
-  | MultiplicativeExpr {}
+Expression: Expression ADD MultiplicativeExpr
+    {
+
+    }
+  | Expression SUB MultiplicativeExpr
+    {
+
+    }
+  | MultiplicativeExpr
+    {
+
+    }
   ;
-ExpressionList: ExpressionList COMMA Expression {}
-  | Expression {}
-  | %empty {}
+ExpressionList: ExpressionList COMMA Expression
+    {
+
+    }
+  | Expression
+    {
+
+    }
+  | %empty
+    {
+
+    }
   ;
 
 /* Multiplicative_Expr */
-MultiplicativeExpr: MultiplicativeExpr MULT Term {}
-  | MultiplicativeExpr DIV Term {}
-  | MultiplicativeExpr MOD Term {}
-  | Term {}
+MultiplicativeExpr: MultiplicativeExpr MULT Term
+    {
+
+    }
+  | MultiplicativeExpr DIV Term
+    {
+
+    }
+  | MultiplicativeExpr MOD Term
+    {
+
+    }
+  | Term
+    {
+
+    }
   ;
 
 /* Term */
-Term: TermInner {}
-  | SUB TermInner {}
-  | Identifier L_PAREN ExpressionList R_PAREN {}
+Term: TermInner
+    {
+
+    }
+  | SUB TermInner
+    {
+
+    }
+  | Identifier L_PAREN ExpressionList R_PAREN
+    {
+
+    }
   ;
-TermInner: Var {}
-  | NUMBER {}
-  | L_PAREN Expression R_PAREN {}
+TermInner: Var
+    {
+
+    }
+  | NUMBER
+    {
+
+    }
+  | L_PAREN Expression R_PAREN
+    {
+      
+    }
   ;
 
 /* Var */
