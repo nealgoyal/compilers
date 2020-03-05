@@ -14,66 +14,58 @@
     string value;
   };
 %}
-%start Program
-%token FUNCTION;
-%token BEGIN_PARAMS;
-%token END_PARAMS;
-%token BEGIN_LOCALS;
-%token END_LOCALS;
-%token BEGIN_BODY;
-%token END_BODY;
-%token INTEGER;
-%token ARRAY;
-%token OF;
-%token IF;
-%token THEN;
-%token ENDIF;
-%token ELSE;
-%token WHILE;
-%token DO;
-%token FOR;
-%token BEGINLOOP;
-%token ENDLOOP;
-%token CONTINUE;
-%token READ;
-%token WRITE;
-%token AND;
-%token OR;
-%token NOT;
-%token TRUE;
-%token FALSE;
-%token RETURN;
-
-%token SUB;
-%token ADD;
-%token MULT;
-%token DIV;
-%token MOD;
-
-%token EQ;
-%token NEQ;
-%token LT;
-%token GT;
-%token LTE;
-%token GTE;
-
-%token<str_val> IDENT;
-%token<str_val> NUMBER;
-
-%token SEMICOLON;
-%token COLON;
-%token COMMA;
-%token L_PAREN;
-%token R_PAREN;
-%token L_SQUARE_BRACKET;
-%token R_SQUARE_BRACKET;
-%token ASSIGN;
-
 %union {
   int int_val;
   char* str_val;
-  nonTerm n_;
+  nonTerm* n_term;
 }
+
+%start Program
+%token FUNCTION;
+%token BEGIN_PARAMS END_PARAMS;
+%token BEGIN_LOCALS END_LOCALS;
+%token BEGIN_BODY END_BODY;
+%token INTEGER ARRAY OF;
+%token IF THEN ENDIF ELSE;
+%token WHILE DO FOR BEGINLOOP ENDLOOP CONTINUE;
+%token READ WRITE;
+%token AND OR NOT TRUE FALSE RETURN;
+
+%token SUB ADD MULT DIV MOD;
+
+%token EQ NEQ LT GT LTE GTE;
+
+%token SEMICOLON COLON COMMA;
+%token L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET;
+%token ASSIGN;
+
+%token<str_val> IDENT;
+%token<int_val> NUMBER;
+
+%type<n_term> Program
+%type<n_term> DeclarationList
+%type<n_term> Declaration
+%type<n_term> FunctionList
+%type<n_term> Function
+%type<n_term> Identifier
+%type<n_term> FunctionParams
+%type<n_term> FunctionLocals
+%type<n_term> FunctionBody
+%type<n_term> StatementList
+%type<n_term> Statement
+%type<n_term> IdentifierList
+%type<n_term> Var
+%type<n_term> VarList
+%type<n_term> Expression
+%type<n_term> ExpressionList
+%type<n_term> BoolExpr
+%type<n_term> RelationAndExpr
+%type<n_term> RelationExpr
+%type<n_term> Relations
+%type<n_term> Comp
+%type<n_term> MultiplicativeExpr
+%type<n_term> Term
+%type<n_term> TermInner
 
 %%
 /* Program */
@@ -81,7 +73,7 @@ Program: FunctionList
     {
 
     }
-  | %empty {nonTerm n; n.ret_name = ""; $$ = n;}
+  | %empty {$$.ret_name = "";}
   ;
 FunctionList: FunctionList Function
     {
@@ -246,18 +238,16 @@ RelationExpr: Relations
   ;
 Relations: Expression Comp Expression
     {
-      nonTerm n;
       string temp_var = makeTemp();
       stringstream ss;
       ss << $1.code << "\n" << $3.code;
       ss << ". " << temp_var;
       ss << $2.value << " " << temp_var << ", " << $1.ret_name << ", " << $3.ret_name;
-      n.code = ss.str();
-      n.ret_name = temp_var;
-      $$ = n;
+      $$.code = ss.str();
+      $$.ret_name = temp_var;
     }
-  | TRUE {nonTerm n; n.value = "1"; $$ = n;}
-  | FALSE {nonTerm n; n.value = "0"; $$ = n;}
+  | TRUE {$$.value = "1";}
+  | FALSE {$$.value = "0";}
   | L_PAREN BoolExpr R_PAREN
     {
 
@@ -265,12 +255,12 @@ Relations: Expression Comp Expression
   ;
 
 /* Comp */
-Comp: EQ {nonTerm n; n.value = "=="; $$ = n;}
-  | NEQ {nonTerm n; n.value = "<>"; $$ = n;}
-  | LT {nonTerm n; n.value = "<"; $$ = n;}
-  | GT {nonTerm n; n.value = ">"; $$ = n;}
-  | LTE {nonTerm n; n.value = "<="; $$ = n;}
-  | GTE {nonTerm n; n.value = ">="; $$ = n;}
+Comp: EQ {$$.value = "==";}
+  | NEQ {$$.value = "<>";}
+  | LT {$$.value = "<";}
+  | GT {$$.value = ">";}
+  | LTE {$$.value = "<=";}
+  | GTE {$$.value = ">=";}
   ;
 
 /* Expression */
@@ -295,7 +285,7 @@ ExpressionList: ExpressionList COMMA Expression
     {
 
     }
-  | %empty {nonTerm n; n.ret_name = ""; $$ = n;}
+  | %empty {$$.ret_name = "";}
   ;
 
 /* Multiplicative_Expr */
@@ -361,7 +351,7 @@ VarList: Var
     }
   | Var COMMA VarList
     {
-      
+
     }
   ;
 
