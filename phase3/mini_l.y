@@ -7,18 +7,13 @@
   int yyerror(string s);
   int yylex(void);
   extern FILE* yyin;
+  
   struct nonTerm {
     string code;
     string ret_name;
     string value;
-  }
+  };
 %}
-
-%union {
-  int int_val;
-  char* str_val;
-}
-
 %start Program
 %token FUNCTION;
 %token BEGIN_PARAMS;
@@ -74,6 +69,12 @@
 %token R_SQUARE_BRACKET;
 %token ASSIGN;
 
+%union {
+  int int_val;
+  char* str_val;
+  nonTerm n_;
+}
+
 %%
 /* Program */
 Program: FunctionList
@@ -82,7 +83,9 @@ Program: FunctionList
     }
   | %empty
     {
-
+      nonTerm n;
+      n.ret_name = "";
+      $$ = n;
     }
   ;
 FunctionList: FunctionList Function
