@@ -144,7 +144,7 @@ Relations: Expression Comp Expression
       stringstream ss;
       ss << $1.code << "\n" << $3.code;
       ss << ". " << temp_var;
-      ss << $2.value << " " << temp_var << " " << $1.ret_name << ", " << $3.ret_name;
+      ss << $2.value << " " << temp_var << ", " << $1.ret_name << ", " << $3.ret_name;
       $$.code = ss.str();
       $$.ret_name = temp_var;
     }
@@ -209,12 +209,12 @@ VarList: Var {}
 %%
 string makeTemp() {
   static int tempNum = 0;
-  return "__temp" + to_string(tempNum++) + "__";
+  return "__temp__" + to_string(tempNum++);
 }
 
 string makeLabel() {
   static int labelNum = 0;
-  return "__label" + to_string(labelNum++) + "__";
+  return "__label__" + to_string(labelNum++);
 }
 
 int yyerror(string s) {
