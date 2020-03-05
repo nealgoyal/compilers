@@ -1,4 +1,4 @@
-%{
+  %{
   #include "stdio.h"
   #include <string>
   #include <iostream>
@@ -6,6 +6,12 @@
   int yyeror(char *s);
   int yyerror(string s);
   int yylex(void);
+  extern FILE* yyin;
+  struct nonTerm {
+    string code;
+    string ret_name;
+    string value;
+  }
 %}
 
 %union {
@@ -70,119 +76,147 @@
 
 %%
 /* Program */
-Program: FunctionList {printf("Program -> FunctionList \n");}
-  | %empty {printf("Program -> epsilon \n");}
+Program: FunctionList {}
+  | %empty {}
   ;
-FunctionList: FunctionList Function {printf("FunctionList -> FunctionList Function \n");}
-  | Function {printf("FunctionList -> Function \n");}
+FunctionList: FunctionList Function {}
+  | Function {}
   ;
 
 /* Function */
-Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBody {printf("Function -> FUNCTION Identifier ; FunctionParams FunctionLocals FunctionBody \n");}
+Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBody {}
   ;
-FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS {printf("FunctionParams -> BEGIN_PARAMS DeclarationList END_PARAMS \n");}
-  | BEGIN_PARAMS END_PARAMS {printf("FunctionParams -> BEGIN_PARAMS END_PARAMS \n");}
+FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS {}
+  | BEGIN_PARAMS END_PARAMS {}
   ;
-FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS {printf("FunctionLocals -> BEGIN_LOCALS DeclarationList END_LOCALS \n");}
-  | BEGIN_LOCALS END_LOCALS {printf("FunctionLocals -> BEGIN_LOCALS END_LOCALS \n");}
+FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS {}
+  | BEGIN_LOCALS END_LOCALS {}
   ;
-FunctionBody: BEGIN_BODY StatementList END_BODY {printf("FunctionBody -> BEGIN_BODY StatementList END_BODY \n");}
-  | BEGIN_BODY END_BODY {printf("FunctionBody -> BEGIN_BODY END_BODY \n");}
+FunctionBody: BEGIN_BODY StatementList END_BODY {}
+  | BEGIN_BODY END_BODY {}
   ;
-DeclarationList: DeclarationList Declaration SEMICOLON {printf("DeclarationList -> DeclarationList Declaration ;\n");}
-  | Declaration SEMICOLON {printf("DeclarationList -> Declaration ;\n");}
+DeclarationList: DeclarationList Declaration SEMICOLON {}
+  | Declaration SEMICOLON {}
   ;
 
 /* Declaration */
-Declaration: IdentifierList COLON INTEGER {printf("Declaration -> IdentifierList : INTEGER\n");}
-  | IdentifierList COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER {printf("Declaration -> IdentifierList : ARRAY [ NUMBER ] OF INTEGER \n");}
+Declaration: IdentifierList COLON INTEGER {}
+  | IdentifierList COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER {}
   ;
-IdentifierList: Identifier {printf("IdentifierList -> Identifier \n");}
-  | IdentifierList COMMA Identifier {printf("IdentifierList -> IdentifierList , Identifier \n");}
+IdentifierList: Identifier {}
+  | IdentifierList COMMA Identifier {}
   ;
-Identifier: IDENT {printf("Identifier -> %s \n", $1);}
+Identifier: IDENT {}
   ;
 
 /* Statement */
-Statement: Var ASSIGN Expression {printf("Statement -> Var := Expression\n");}
-  | IF BoolExpr THEN StatementList ENDIF {printf("Statement -> IF BoolExpr THEN StatementList ENDIF\n");}
-  | IF BoolExpr THEN StatementList ELSE StatementList ENDIF {printf("Statement -> IF BoolExpr THEN StatementList ELSE StatementList ENDIF\n");}
-  | WHILE BoolExpr BEGINLOOP StatementList ENDLOOP {printf("Statement -> WHILE BoolExpr BEGINLOOP StatementList ENDLOOP\n");}
-  | DO BEGINLOOP StatementList ENDLOOP WHILE BoolExpr {printf("Statement -> DO BEGINLOOP StatementList ENDLOOP WHILE BoolExpr\n");}
-  | FOR Var ASSIGN NUMBER SEMICOLON BoolExpr SEMICOLON Var ASSIGN Expression BEGINLOOP StatementList ENDLOOP {printf("Statement -> FOR Var := NUMBER ; BoolExpr ; Var := Expression BEGINLOOP StatementList ENDLOOP\n");}
-  | READ VarList {printf("Statement -> READ VarList\n");}
-  | WRITE VarList {printf("Statement -> WRITE VarList\n");}
-  | CONTINUE {printf("Statement -> CONTINUE\n");}
-  | RETURN Expression {printf("Statement -> RETURN Expression\n");}
+Statement: Var ASSIGN Expression {}
+  | IF BoolExpr THEN StatementList ENDIF {}
+  | IF BoolExpr THEN StatementList ELSE StatementList ENDIF {}
+  | WHILE BoolExpr BEGINLOOP StatementList ENDLOOP {}
+  | DO BEGINLOOP StatementList ENDLOOP WHILE BoolExpr {}
+  | FOR Var ASSIGN NUMBER SEMICOLON BoolExpr SEMICOLON Var ASSIGN Expression BEGINLOOP StatementList ENDLOOP {}
+  | READ VarList {}
+  | WRITE VarList {}
+  | CONTINUE {}
+  | RETURN Expression {}
   ;
-StatementList: Statement SEMICOLON {printf("StatementList -> Statement ;\n");}
-  | StatementList Statement SEMICOLON {printf("StatementList -> StatementList Statement ;\n");}
+StatementList: Statement SEMICOLON {}
+  | StatementList Statement SEMICOLON {}
   ;
 
 /* Bool-Expr */
-BoolExpr: BoolExpr OR RelationAndExpr {printf("BoolExpr -> BoolExpr OR RelationAndExpr\n");}
-  | RelationAndExpr {printf("BoolExpr -> RelationAndExpr\n");}
+BoolExpr: BoolExpr OR RelationAndExpr {}
+  | RelationAndExpr {}
   ;
 /* Relation_And_Expr */
-RelationAndExpr: RelationAndExpr AND RelationExpr {printf("RelationAndExpr -> RelationAndExpr AND RelationExpr\n");}
-  | RelationExpr {printf("RelationAndExpr -> RelationExpr\n");}
+RelationAndExpr: RelationAndExpr AND RelationExpr {}
+  | RelationExpr {}
   ;
 
 /* Relation_Expr */
-RelationExpr: Relations {printf("RelationExpr -> Relations\n");}
-  | NOT Relations {printf("RelationExpr -> NOT Relations\n");}
+RelationExpr: Relations {}
+  | NOT Relations {}
   ;
-Relations: Expression Comp Expression {printf("Relations -> Expression Comp Expression\n");}
-  | TRUE {printf("Relations -> TRUE\n");}
-  | FALSE {printf("Relations -> FALSE\n");}
-  | L_PAREN BoolExpr R_PAREN {printf("Relations -> ( BoolExpr )\n");}
+Relations: Expression Comp Expression
+    {
+      string temp_var = makeTemp();
+      stringstream ss;
+      ss << $1.code << "\n" << $3.code;
+      ss << ". " << temp_var;
+      ss << $2.value << " " << temp_var << " " << $1.ret_name << ", " << $3.ret_name;
+      $$.code = ss.str();
+      $$.ret_name = temp_var;
+    }
+  | TRUE
+    {
+
+    }
+  | FALSE
+    {
+
+    }
+  | L_PAREN BoolExpr R_PAREN
+    {
+
+    }
   ;
 
 /* Comp */
-Comp: EQ {printf("Comp -> ==\n");}
-  | NEQ {printf("Comp -> <>\n");}
-  | LT {printf("Comp -> <\n");}
-  | GT {printf("Comp -> >\n");}
-  | LTE {printf("Comp -> <=\n");}
-  | GTE {printf("Comp -> >=\n");}
+Comp: EQ {$$.value = "==";}
+  | NEQ {$$.value = "<>";}
+  | LT {$$.value = "<";}
+  | GT {$$.value = ">";}
+  | LTE {$$.value = "<=";}
+  | GTE {$$.value = ">=";}
   ;
 
 /* Expression */
-Expression: Expression ADD MultiplicativeExpr {printf("Expression -> Expression + MultiplicativeExpr\n");}
-  | Expression SUB MultiplicativeExpr {printf("Expression -> Expression - MultiplicativeExpr\n");}
-  | MultiplicativeExpr {printf("Expression -> MultiplicativeExpr\n");}
+Expression: Expression ADD MultiplicativeExpr {}
+  | Expression SUB MultiplicativeExpr {}
+  | MultiplicativeExpr {}
   ;
-ExpressionList: ExpressionList COMMA Expression {printf("ExpressionList -> ExpressionList Expression ,\n");}
-  | Expression {printf("ExpressionList -> Expression\n");}
-  | %empty {printf("ExpressionList -> epsilon\n");}
+ExpressionList: ExpressionList COMMA Expression {}
+  | Expression {}
+  | %empty {}
   ;
 
 /* Multiplicative_Expr */
-MultiplicativeExpr: MultiplicativeExpr MULT Term {printf("MultiplicativeExpr -> MultiplicativeExpr * Term\n");}
-  | MultiplicativeExpr DIV Term {printf("MultiplicativeExpr -> MultiplicativeExpr / Term\n");}
-  | MultiplicativeExpr MOD Term {printf("MultiplicativeExpr -> MultiplicativeExpr % Term\n");}
-  | Term {printf("MultiplicativeExpr -> Term\n");}
+MultiplicativeExpr: MultiplicativeExpr MULT Term {}
+  | MultiplicativeExpr DIV Term {}
+  | MultiplicativeExpr MOD Term {}
+  | Term {}
   ;
 
 /* Term */
-Term: TermInner
-  | SUB TermInner {printf("Term -> - TermInner\n");}
-  | Identifier L_PAREN ExpressionList R_PAREN {printf("Term -> Identifier ( ExpressionList )\n");}
+Term: TermInner {}
+  | SUB TermInner {}
+  | Identifier L_PAREN ExpressionList R_PAREN {}
   ;
-TermInner: Var {printf("TermInner -> Var\n");}
-  | NUMBER {printf("TermInner -> %s\n", $1);}
-  | L_PAREN Expression R_PAREN {printf("TermInner -> ( Expression )\n");}
+TermInner: Var {}
+  | NUMBER {}
+  | L_PAREN Expression R_PAREN {}
   ;
 
 /* Var */
-Var: Identifier {printf("Var -> Identifier\n");}
-  | Identifier L_SQUARE_BRACKET Expression R_SQUARE_BRACKET {printf("Var -> Identifier [ Expression ]\n");}
+Var: Identifier {}
+  | Identifier L_SQUARE_BRACKET Expression R_SQUARE_BRACKET {}
   ;
-VarList: Var {printf("VarList -> Var\n");}
-  | Var COMMA VarList {printf("VarList -> VarList Var ,\n");}
+VarList: Var {}
+  | Var COMMA VarList {}
   ;
 
 %%
+string makeTemp() {
+  static int tempNum = 0;
+  return "__temp" + to_string(tempNum++) + "__";
+}
+
+string makeLabel() {
+  static int labelNum = 0;
+  return "__label" + to_string(labelNum++) + "__";
+}
+
 int yyerror(string s) {
   extern int currLine, currPos;
   extern char *yytext;
