@@ -48,6 +48,8 @@ https://www.cs.ucr.edu/~cxu009/teaching/CS152-winter20/webpages3/phase3_code_gen
 ```
 > cd cs 152
 > cd phase3
+> make clean
+> make
 ```
 
 ## Dependencies
