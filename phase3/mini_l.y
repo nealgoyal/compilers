@@ -106,7 +106,7 @@ FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
     }
   | BEGIN_PARAMS END_PARAMS
     {
-
+      $$->code = "";
     }
   ;
 FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS
@@ -115,7 +115,7 @@ FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS
     }
   | BEGIN_LOCALS END_LOCALS
     {
-
+      $$->code = "";
     }
   ;
 FunctionBody: BEGIN_BODY StatementList END_BODY
@@ -124,7 +124,7 @@ FunctionBody: BEGIN_BODY StatementList END_BODY
     }
   | BEGIN_BODY END_BODY
     {
-
+      $$->code = "";
     }
   ;
 DeclarationList: DeclarationList Declaration SEMICOLON
