@@ -1,18 +1,27 @@
-  %{
-  #include "stdio.h"
-  #include <string>
-  #include <iostream>
+%code requires{
+  #include<string>
   using namespace std;
-  int yyeror(char *s);
-  int yyerror(string s);
-  int yylex(void);
-  extern FILE* yyin;
   
   struct nonTerm {
     string code;
     string ret_name;
     string value;
   };
+}
+
+%{
+  #include "stdio.h"
+  #include <string>
+  #include <iostream>
+  #include <sstream>
+  using namespace std;
+  int yyeror(char *s);
+  int yyerror(string s);
+  int yylex(void);
+  string makeTemp();
+  string makeLabel();
+  extern FILE* yyin;
+  
 %}
 %union {
   int int_val;
@@ -73,7 +82,7 @@ Program: FunctionList
     {
 
     }
-  | %empty {$$.ret_name = "";}
+  | %empty {$$->ret_name = "";}
   ;
 FunctionList: FunctionList Function
     {
@@ -240,14 +249,14 @@ Relations: Expression Comp Expression
     {
       string temp_var = makeTemp();
       stringstream ss;
-      ss << $1.code << "\n" << $3.code;
+      ss << $1->code << "\n" << $3->code;
       ss << ". " << temp_var;
-      ss << $2.value << " " << temp_var << ", " << $1.ret_name << ", " << $3.ret_name;
-      $$.code = ss.str();
-      $$.ret_name = temp_var;
+      ss << $2->value << " " << temp_var << ", " << $1->ret_name << ", " << $3->ret_name;
+      $$->code = ss.str();
+      $$->ret_name = temp_var;
     }
-  | TRUE {$$.value = "1";}
-  | FALSE {$$.value = "0";}
+  | TRUE {$$->value = "1";}
+  | FALSE {$$->value = "0";}
   | L_PAREN BoolExpr R_PAREN
     {
 
@@ -255,12 +264,12 @@ Relations: Expression Comp Expression
   ;
 
 /* Comp */
-Comp: EQ {$$.value = "==";}
-  | NEQ {$$.value = "<>";}
-  | LT {$$.value = "<";}
-  | GT {$$.value = ">";}
-  | LTE {$$.value = "<=";}
-  | GTE {$$.value = ">=";}
+Comp: EQ {$$->value = "==";}
+  | NEQ {$$->value = "<>";}
+  | LT {$$->value = "<";}
+  | GT {$$->value = ">";}
+  | LTE {$$->value = "<=";}
+  | GTE {$$->value = ">=";}
   ;
 
 /* Expression */
@@ -285,7 +294,7 @@ ExpressionList: ExpressionList COMMA Expression
     {
 
     }
-  | %empty {$$.ret_name = "";}
+  | %empty {$$->ret_name = "";}
   ;
 
 /* Multiplicative_Expr */
