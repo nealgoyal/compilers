@@ -133,7 +133,13 @@ DeclarationList: DeclarationList Declaration SEMICOLON
     }
   | Declaration SEMICOLON
     {
-
+      string temp_var = makeTemp();
+      stringstream ss;
+      ss << $1->code;
+      ss << ". " << temp_var;
+      ss << $2->value << " " << temp_var << " " << $1->ret_name;
+      $$->code = ss.str();
+      $$->ret_name = temp_var;
     }
   ;
 
