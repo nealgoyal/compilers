@@ -6,5 +6,4 @@ make:
 
 
 clean:
-		rm -rf mini_l.output mini_l.tab.* my_compiler
-		-rm input.txt
+		rm -rf mini_l.output mini_l.tab.* my_compiler lex.yy.c input.txt
