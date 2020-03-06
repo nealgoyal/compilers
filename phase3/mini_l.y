@@ -347,11 +347,23 @@ TermInner: Var
 /* Var */
 Var: Identifier
     {
-
+      string temp_var = makeTemp();
+      stringstream ss;
+      ss << $1->code;
+      ss << ". " << temp_var;
+      ss << temp_var << " " << $1->ret_name;
+      $$->code = ss.str();
+      $$->ret_name = temp_var;
     }
   | Identifier L_SQUARE_BRACKET Expression R_SQUARE_BRACKET
     {
-
+      string temp_var = makeTemp();
+      stringstream ss;
+      ss << $1->code << "\n" << $3->code;
+      ss << ". " << temp_var;
+      ss << $$->value << $$->value << " " << temp_var << ", " << $1->ret_name << ", " << $3->ret_name;
+      $$->code = ss.str();
+      $$->ret_name = temp_var;
     }
   ;
 VarList: Var

@@ -1,5 +1,0 @@
-IdentifierList -> k 
-Declaration -> IdentifierList COLON INTEGER 
-DeclarationList -> Declaration ; 
-FunctionParams -> BEGIN_PARAMS DeclarationList END_PARAMS 
-FunctionLocals -> BEGIN_LOCALS END_LOCALS 
