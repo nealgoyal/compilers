@@ -350,7 +350,10 @@ ExpressionList: ExpressionList COMMA Expression
     {
 
     }
-  | %empty {/*$$->ret_name = "";*/}
+  | %empty
+    {
+      $$ = new nonTerm();
+    }
   ;
 
 /* Multiplicative_Expr */
@@ -392,7 +395,7 @@ TermInner: Var
     }
   | NUMBER
     {
-
+      
     }
   | L_PAREN Expression R_PAREN
     {
