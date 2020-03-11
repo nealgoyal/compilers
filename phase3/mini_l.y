@@ -20,6 +20,7 @@
   int yylex(void);
   string makeTemp();
   string makeLabel();
+  string createVar(char*);
   extern FILE* yyin;
   
 %}
@@ -80,9 +81,9 @@
 /* Program */
 Program: FunctionList
     {
-
+      // cout << $1->code << endl;
     }
-  | %empty {$$->ret_name = "";}
+  | %empty {/*$$->ret_name = "";*/}
   ;
 FunctionList: FunctionList Function
     {
@@ -90,23 +91,26 @@ FunctionList: FunctionList Function
     }
   | Function
     {
-
+      // $$->code = $1->code;
     }
   ;
 
 /* Function */
 Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBody
     {
-
+      // stringstream ss;
+      // ss << "func " << $2->code << "\n";
+      // ss << $4->code << "\n" << $5->code << "\n" << $6->code << "\n";
+      // $$->code = ss.str();
     }
   ;
 FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
     {
-
+      // $$->code = $2->code;
     }
   | BEGIN_PARAMS END_PARAMS
     {
-      $$->code = "";
+      // $$->code = "";
     }
   ;
 FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS
@@ -115,7 +119,7 @@ FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS
     }
   | BEGIN_LOCALS END_LOCALS
     {
-      $$->code = "";
+      // $$->code = "";
     }
   ;
 FunctionBody: BEGIN_BODY StatementList END_BODY
@@ -124,7 +128,7 @@ FunctionBody: BEGIN_BODY StatementList END_BODY
     }
   | BEGIN_BODY END_BODY
     {
-      $$->code = "";
+      // $$->code = "";
     }
   ;
 DeclarationList: DeclarationList Declaration SEMICOLON
@@ -133,39 +137,50 @@ DeclarationList: DeclarationList Declaration SEMICOLON
     }
   | Declaration SEMICOLON
     {
-      string temp_var = makeTemp();
-      stringstream ss;
-      ss << $1->code;
-      ss << ". " << temp_var;
-      ss << $2->value << " " << temp_var << " " << $1->ret_name;
-      $$->code = ss.str();
-      $$->ret_name = temp_var;
+      // string temp_var = makeTemp();
+      // stringstream ss;
+      // ss << $1->code;
+      // ss << ". " << temp_var;
+      // ss << "; " << temp_var << " " << $1->ret_name;
+      // $$->code = ss.str();
+      // $$->ret_name = temp_var;
     }
   ;
 
 /* Declaration */
 Declaration: IdentifierList COLON INTEGER
     {
-
+      // stringstream ss;
+      // ss << $1->code << " : integer" << endl;
+      // $$->code = ss.str();
     }
   | IdentifierList COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
     {
 
     }
   ;
-IdentifierList: Identifier
+IdentifierList: Identifier {
+    $$ = new nonTerm();
+    stringstream ss;
+    ss << ". " << $1->code;
+    $$->code = ss.str();
+    cout << "Identifier code: " << $$->code << endl;
+  }
+  | Identifier COMMA IdentifierList
     {
-
-    }
-  | IdentifierList COMMA Identifier
-    {
-
+      $$ = new nonTerm();
+      stringstream ss;
+      ss << ". " << $1->code << endl;
+      ss << $3->code << endl;
+      $$->code = ss.str();
+      cout << "IdentifierList code: \n" << $$->code;
     }
   ;
-Identifier: IDENT
-    {
-
-    }
+Identifier: IDENT {
+  $$ = new nonTerm();
+  $$->code = $1;
+  cout << "IDENT: " << $$->code << endl;
+  }
   ;
 
 /* Statement */
@@ -253,16 +268,16 @@ RelationExpr: Relations
   ;
 Relations: Expression Comp Expression
     {
-      string temp_var = makeTemp();
-      stringstream ss;
-      ss << $1->code << "\n" << $3->code;
-      ss << ". " << temp_var;
-      ss << $2->value << " " << temp_var << ", " << $1->ret_name << ", " << $3->ret_name;
-      $$->code = ss.str();
-      $$->ret_name = temp_var;
+      // string temp_var = makeTemp();
+      // stringstream ss;
+      // ss << $1->code << "\n" << $3->code;
+      // ss << ". " << temp_var;
+      // ss << $2->value << " " << temp_var << ", " << $1->ret_name << ", " << $3->ret_name;
+      // $$->code = ss.str();
+      // $$->ret_name = temp_var;
     }
-  | TRUE {$$->value = "1";}
-  | FALSE {$$->value = "0";}
+  | TRUE {/*$$->value = "1";*/}
+  | FALSE {/*$$->value = "0";*/}
   | L_PAREN BoolExpr R_PAREN
     {
 
@@ -270,12 +285,12 @@ Relations: Expression Comp Expression
   ;
 
 /* Comp */
-Comp: EQ {$$->value = "==";}
-  | NEQ {$$->value = "<>";}
-  | LT {$$->value = "<";}
-  | GT {$$->value = ">";}
-  | LTE {$$->value = "<=";}
-  | GTE {$$->value = ">=";}
+Comp: EQ {/*$$->value = "==";*/}
+  | NEQ {/*$$->value = "<>";*/}
+  | LT {/*$$->value = "<";*/}
+  | GT {/*$$->value = ">";*/}
+  | LTE {/*$$->value = "<=";*/}
+  | GTE {/*$$->value = ">=";*/}
   ;
 
 /* Expression */
@@ -300,7 +315,7 @@ ExpressionList: ExpressionList COMMA Expression
     {
 
     }
-  | %empty {$$->ret_name = "";}
+  | %empty {/*$$->ret_name = "";*/}
   ;
 
 /* Multiplicative_Expr */
@@ -353,23 +368,23 @@ TermInner: Var
 /* Var */
 Var: Identifier
     {
-      string temp_var = makeTemp();
-      stringstream ss;
-      ss << $1->code;
-      ss << ". " << temp_var;
-      ss << temp_var << " " << $1->ret_name;
-      $$->code = ss.str();
-      $$->ret_name = temp_var;
+      // string temp_var = makeTemp();
+      // stringstream ss;
+      // ss << $1->code;
+      // ss << ". " << temp_var;
+      // ss << temp_var << " " << $1->ret_name;
+      // $$->code = ss.str();
+      // $$->ret_name = temp_var;
     }
   | Identifier L_SQUARE_BRACKET Expression R_SQUARE_BRACKET
     {
-      string temp_var = makeTemp();
-      stringstream ss;
-      ss << $1->code << "\n" << $3->code;
-      ss << ". " << temp_var;
-      ss << $$->value << $$->value << " " << temp_var << ", " << $1->ret_name << ", " << $3->ret_name;
-      $$->code = ss.str();
-      $$->ret_name = temp_var;
+      // string temp_var = makeTemp();
+      // stringstream ss;
+      // ss << $1->code << "\n" << $3->code;
+      // ss << ". " << temp_var;
+      // ss << ". []" << $$->value << " " << temp_var << ", " << $1->ret_name << ", " << $3->ret_name;
+      // $$->code = ss.str();
+      // $$->ret_name = temp_var;
     }
   ;
 VarList: Var
@@ -391,6 +406,12 @@ string makeTemp() {
 string makeLabel() {
   static int labelNum = 0;
   return "__label__" + to_string(labelNum++);
+}
+
+string createVar(char* ident) {
+  string newVar = string(ident);
+  // add variable to the syntax table
+  return newVar;
 }
 
 int yyerror(string s) {
