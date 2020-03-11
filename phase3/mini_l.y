@@ -81,54 +81,75 @@
 /* Program */
 Program: FunctionList
     {
-      // cout << $1->code << endl;
+      $$ = new nonTerm();
+      $$->code = $1->code;
+      cout << $$->code << endl;
     }
-  | %empty {/*$$->ret_name = "";*/}
-  ;
-FunctionList: FunctionList Function
+  | %empty 
     {
-
+      $$ = "";
+      cout << $$;
+    }
+  ;
+FunctionList: Function FunctionList
+    {
+      $$ = new nonTerm();
+      stringstream ss;
+      ss << $1->code << endl << endl << $2->code;
+      $$->code = ss.str();
     }
   | Function
     {
-      // $$->code = $1->code;
+      $$ = new nonTerm();
+      $$->code = $1->code;
     }
   ;
 
 /* Function */
 Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBody
     {
-      // stringstream ss;
-      // ss << "func " << $2->code << "\n";
-      // ss << $4->code << "\n" << $5->code << "\n" << $6->code << "\n";
-      // $$->code = ss.str();
+      $$ = new nonTerm();
+      stringstream ss;
+      ss << "func " << $2->code << endl;
+      
+      ss << $4->code;
+      if ($4->code.length() > 0) {ss << endl;}
+      
+      ss << $5->code;
+      if ($5->code.length() > 0) {ss << endl;}
+      
+      ss << $6->code;
+      if ($6->code.length() > 0) {ss << endl;}
+      
+      ss << "endfunc";
+      $$->code = ss.str();
     }
   ;
 FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
     {
-      // $$->code = $2->code;
+      $$ = new nonTerm();
+      $$->code = $2->code;
     }
   | BEGIN_PARAMS END_PARAMS
     {
-      // $$->code = "";
+      $$ = new nonTerm();
     }
   ;
-FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS
-    {
-
+FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS {
+      $$ = new nonTerm();
+      $$->code = $2->code;
     }
-  | BEGIN_LOCALS END_LOCALS
-    {
-      // $$->code = "";
+  | BEGIN_LOCALS END_LOCALS {
+      $$ = new nonTerm();
     }
   ;
 FunctionBody: BEGIN_BODY StatementList END_BODY
     {
-
+      $$ = new nonTerm();
     }
   | BEGIN_BODY END_BODY
     {
-      // $$->code = "";
+      $$ = new nonTerm();
     }
   ;
 DeclarationList: DeclarationList Declaration SEMICOLON
@@ -137,7 +158,6 @@ DeclarationList: DeclarationList Declaration SEMICOLON
       stringstream ss;
       ss << $1->code << endl << $2->code;
       $$->code = ss.str();
-      cout << $$->code << endl;
     }
   | Declaration SEMICOLON
     {
@@ -184,9 +204,8 @@ IdentifierList: Identifier {
     stringstream ss;
     ss << "_" << $1->code;
     $$->code = ss.str();
-  }
-  | Identifier COMMA IdentifierList
-    {
+    }
+  | Identifier COMMA IdentifierList {
       $$ = new nonTerm();
       stringstream ss;
       ss << "_" << $1->code << "," << $3->code;
