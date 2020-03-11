@@ -133,17 +133,16 @@ FunctionBody: BEGIN_BODY StatementList END_BODY
   ;
 DeclarationList: DeclarationList Declaration SEMICOLON
     {
-
+      $$ = new nonTerm();
+      stringstream ss;
+      ss << $1->code << endl << $2->code;
+      $$->code = ss.str();
+      cout << $$->code << endl;
     }
   | Declaration SEMICOLON
     {
-      // string temp_var = makeTemp();
-      // stringstream ss;
-      // ss << $1->code;
-      // ss << ". " << temp_var;
-      // ss << "; " << temp_var << " " << $1->ret_name;
-      // $$->code = ss.str();
-      // $$->ret_name = temp_var;
+      $$ = new nonTerm();
+      $$->code = $1->code;
     }
   ;
 
@@ -162,7 +161,6 @@ Declaration: IdentifierList COLON INTEGER
         }
       }
       $$->code = ss.str();
-      cout << $$->code << endl;
     }
   | IdentifierList COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
     {
@@ -179,7 +177,6 @@ Declaration: IdentifierList COLON INTEGER
       }
       ss << ", " << to_string($5);
       $$->code = ss.str();
-      cout << $$->code << endl;
     }
   ;
 IdentifierList: Identifier {
@@ -193,13 +190,12 @@ IdentifierList: Identifier {
       $$ = new nonTerm();
       stringstream ss;
       ss << "_" << $1->code << "," << $3->code;
-      // ss << $3->code << endl;
       $$->code = ss.str();
     }
   ;
 Identifier: IDENT {
-  $$ = new nonTerm();
-  $$->code = $1;
+    $$ = new nonTerm();
+    $$->code = $1;
   }
   ;
 
