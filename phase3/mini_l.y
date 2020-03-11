@@ -156,7 +156,6 @@ Declaration: IdentifierList COLON INTEGER
       for (unsigned i = 0; i < $1->code.length(); ++i) {
         if ($1->code.at(i) == ',') {
           ss << endl << ". ";
-          // cout << $1->code.at(i);
         }
         else {
           ss << $1->code.at(i);
@@ -167,7 +166,20 @@ Declaration: IdentifierList COLON INTEGER
     }
   | IdentifierList COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
     {
-
+      $$ = new nonTerm();
+      stringstream ss;
+      ss << ".[] ";
+      for (unsigned i = 0; i < $1->code.length(); ++i) {
+        if ($1->code.at(i) == ',') {
+          ss << ", " << to_string($5) << endl << ".[] ";
+        }
+        else {
+          ss << $1->code.at(i);
+        }
+      }
+      ss << ", " << to_string($5);
+      $$->code = ss.str();
+      cout << $$->code << endl;
     }
   ;
 IdentifierList: Identifier {
