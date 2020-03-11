@@ -412,7 +412,12 @@ Var: Identifier
       // ss << ". " << temp_var;
       // ss << temp_var << " " << $1->ret_name;
       // $$->code = ss.str();
-      // $$->ret_name = temp_var;
+      // $$->ret_name = temp_var; 
+
+      $$ = new nonTerm();
+      stringstream ss;
+      ss << $1->code;
+      $$->code = ss.str();
     }
   | Identifier L_SQUARE_BRACKET Expression R_SQUARE_BRACKET
     {
@@ -423,6 +428,11 @@ Var: Identifier
       // ss << ". []" << $$->value << " " << temp_var << ", " << $1->ret_name << ", " << $3->ret_name;
       // $$->code = ss.str();
       // $$->ret_name = temp_var;
+
+      $$ = new nonTerm();
+      stringstream ss;
+      ss << $1->code << ", " << $3->code;
+      $$->code = ss.str();
     }
   ;
 VarList: Var
