@@ -150,9 +150,20 @@ DeclarationList: DeclarationList Declaration SEMICOLON
 /* Declaration */
 Declaration: IdentifierList COLON INTEGER
     {
-      // stringstream ss;
-      // ss << $1->code << " : integer" << endl;
-      // $$->code = ss.str();
+      $$ = new nonTerm();
+      stringstream ss;
+      ss << ". ";
+      for (unsigned i = 0; i < $1->code.length(); ++i) {
+        if ($1->code.at(i) == ',') {
+          ss << endl << ". ";
+          // cout << $1->code.at(i);
+        }
+        else {
+          ss << $1->code.at(i);
+        }
+      }
+      $$->code = ss.str();
+      cout << $$->code << endl;
     }
   | IdentifierList COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
     {
@@ -162,24 +173,21 @@ Declaration: IdentifierList COLON INTEGER
 IdentifierList: Identifier {
     $$ = new nonTerm();
     stringstream ss;
-    ss << ". " << $1->code;
+    ss << "_" << $1->code;
     $$->code = ss.str();
-    cout << "Identifier code: " << $$->code << endl;
   }
   | Identifier COMMA IdentifierList
     {
       $$ = new nonTerm();
       stringstream ss;
-      ss << ". " << $1->code << endl;
-      ss << $3->code << endl;
+      ss << "_" << $1->code << "," << $3->code;
+      // ss << $3->code << endl;
       $$->code = ss.str();
-      cout << "IdentifierList code: \n" << $$->code;
     }
   ;
 Identifier: IDENT {
   $$ = new nonTerm();
   $$->code = $1;
-  cout << "IDENT: " << $$->code << endl;
   }
   ;
 
