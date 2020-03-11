@@ -45,12 +45,12 @@ LETTER [a-zA-Z]
 "/"               {currPos += yyleng; return DIV;}
 "%"               {currPos += yyleng; return MOD;}
 
-"=="              {currPos += yyleng; return EQ;}
-"<>"              {currPos += yyleng; return NEQ;}
-"<"               {currPos += yyleng; return LT;}
-">"               {currPos += yyleng; return GT;}
-"<="              {currPos += yyleng; return LTE;}
-">="              {currPos += yyleng; return GTE;}
+"=="              {yylval.str_val = strdup(yytext); currPos += yyleng; return EQ;}
+"<>"              {yylval.str_val = strdup(yytext); currPos += yyleng; return NEQ;}
+"<"               {yylval.str_val = strdup(yytext); currPos += yyleng; return LT;}
+">"               {yylval.str_val = strdup(yytext); currPos += yyleng; return GT;}
+"<="              {yylval.str_val = strdup(yytext); currPos += yyleng; return LTE;}
+">="              {yylval.str_val = strdup(yytext); currPos += yyleng; return GTE;}
 
 ";"               {currPos += yyleng; return SEMICOLON;}
 ":"               {currPos += yyleng; return COLON;}

@@ -51,6 +51,7 @@
 
 %token<str_val> IDENT;
 %token<int_val> NUMBER;
+%type<str_val> Comp
 
 %type<n_term> Program
 %type<n_term> DeclarationList
@@ -72,7 +73,6 @@
 %type<n_term> RelationAndExpr
 %type<n_term> RelationExpr
 %type<n_term> Relations
-%type<n_term> Comp
 %type<n_term> MultiplicativeExpr
 %type<n_term> Term
 %type<n_term> TermInner
@@ -87,8 +87,8 @@ Program: FunctionList
     }
   | %empty 
     {
-      $$ = "";
-      cout << $$;
+      $$ = new nonTerm();
+      cout << $$->code << endl;
     }
   ;
 FunctionList: Function FunctionList
@@ -320,12 +320,12 @@ Relations: Expression Comp Expression
   ;
 
 /* Comp */
-Comp: EQ {/*$$->value = "==";*/}
-  | NEQ {/*$$->value = "<>";*/}
-  | LT {/*$$->value = "<";*/}
-  | GT {/*$$->value = ">";*/}
-  | LTE {/*$$->value = "<=";*/}
-  | GTE {/*$$->value = ">=";*/}
+Comp: EQ {cout << "EQ: " << $$ << endl;}
+  | NEQ {cout << "NEQ: " << $$ << endl;}
+  | LT {cout << "LT: " << $$ << endl;}
+  | GT {cout << "GT: " << $$ << endl;}
+  | LTE {cout << "LTE: " << $$ << endl;}
+  | GTE {cout << "GTE: " << $$ << endl;}
   ;
 
 /* Expression */
