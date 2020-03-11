@@ -438,10 +438,35 @@ Var: Identifier
 VarList: Var
     {
 
+      $$ = new nonTerm();
+      stringstream ss;
+
+      if ($1->code.find("[")) {
+          ss << ".[] ";
+        }
+      else {
+          ss << ".| ";
+        }
+
+      ss << $1->code << endl;
+      $$->code = ss.str();
+
     }
   | Var COMMA VarList
     {
+      $$ = new nonTerm();
+      stringstream ss;
 
+      if ($1->code.find("[")) {
+          ss << ".[] ";
+        }
+      else {
+          ss << ".| ";
+        }
+
+      //ss << $1->code << endl << $3->code;
+      ss << $1->code << ", " << $3->code << endl;
+      $$->code = ss.str();
     }
   ;
 
