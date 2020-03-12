@@ -21,6 +21,7 @@
   string makeTemp();
   string makeLabel();
   string createVar(char*);
+  string findIndex (const string&);
   extern FILE* yyin;
   
 %}
@@ -279,7 +280,6 @@ Statement: Var ASSIGN Expression
       }
 
       $$->code = ss.str();
-      cout << $$->code << endl;
     }
   | WRITE VarList
     {
@@ -477,20 +477,6 @@ Var: Identifier
   ;
 VarList: Var
     {
-      // Neal's code
-      // $$ = new nonTerm();
-      // stringstream ss;
-
-      // if ($1->code.find("[")) {
-      //     ss << ".[] ";
-      //   }
-      // else {
-      //     ss << ".| ";
-      //   }
-
-      // ss << $1->code << endl;
-      // $$->code = ss.str();
-
       $$ = new nonTerm();
       stringstream ss;
       ss << "_" << $1->code;
@@ -498,20 +484,6 @@ VarList: Var
     }
   | Var COMMA VarList
     {
-      // Neal's code
-      // $$ = new nonTerm();
-      // stringstream ss;
-
-      // if ($1->code.find("[")) {
-      //   ss << ".[] ";
-      // }
-      // else {
-      //   ss << ".| ";
-      // }
-
-      // ss << $1->code << ", " << $3->code << endl;
-      // $$->code = ss.str();
-
       $$ = new nonTerm();
       stringstream ss;
       ss << "_" << $1->code << "," << $3->code;
@@ -534,6 +506,20 @@ string createVar(char* ident) {
   string newVar = string(ident);
   // add variable to the syntax table
   return newVar;
+}
+
+string findIndex (const string &ref) {
+  // return x in _ident[xx]
+  unsigned leftB = ref.find('[');
+  if (leftB != string::npos) {
+    // [ exists at leftB, ] exists at ref.length() - 1
+    int indexLength = ((ref.length() - 1) - leftB) - 1;
+    return ref.substr(leftB + 1, indexLength);
+  }
+  else {
+    // return yyerror("Tried to find index in a non-array variable.");
+    exit(1);
+  }
 }
 
 int yyerror(string s) {
