@@ -437,7 +437,7 @@ TermInner: Var
     }
   | L_PAREN Expression R_PAREN
     {
-      
+      // $2->code == evalutated expression
     }
   ;
 
