@@ -146,6 +146,7 @@ FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS {
 FunctionBody: BEGIN_BODY StatementList END_BODY
     {
       $$ = new nonTerm();
+      $$->code = $2->code;
     }
   | BEGIN_BODY END_BODY
     {
@@ -200,10 +201,10 @@ Declaration: IdentifierList COLON INTEGER
     }
   ;
 IdentifierList: Identifier {
-    $$ = new nonTerm();
-    stringstream ss;
-    ss << "_" << $1->code;
-    $$->code = ss.str();
+      $$ = new nonTerm();
+      stringstream ss;
+      ss << "_" << $1->code;
+      $$->code = ss.str();
     }
   | Identifier COMMA IdentifierList {
       $$ = new nonTerm();
@@ -245,11 +246,44 @@ Statement: Var ASSIGN Expression
     }
   | READ VarList
     {
+      // cout << $2->code << endl;
+      $$ = new nonTerm();
+      stringstream ss;
+      string temp = "";
+      for (unsigned i = 0; i < $2->code.length(); ++i) {
+        //find each comma
+        if ($2->code[i] != ',') {
+          temp.push_back($2->code[i]);
+        }
+        else {
+          // reach comma
+          if (temp[temp.length() - 1] == ']') {
+            //add array var to stream (_ident[2])
+            // - calculate x : [ x ] (str.find('[') => pull substring between index '[' and ']'
+          }
+          else {
+            // add integer var to stream
+            ss << ".< " << temp << endl;
+          }
+          temp = "";
+        }
+      }
+      // add last ident in temp (DO NOT END WITH ENDL)
+      if (temp[temp.length() - 1] == ']') {
+        //add array var to stream (_ident[2])
+        // - calculate x : [ x ] (str.find('[') => pull substring between index '[' and ']'
+      }
+      else {
+        // add integer var to stream
+        ss << ".< " << temp;
+      }
 
+      $$->code = ss.str();
+      cout << $$->code << endl;
     }
   | WRITE VarList
     {
-
+      $$ = new nonTerm();
     }
   | CONTINUE
     {
@@ -262,11 +296,15 @@ Statement: Var ASSIGN Expression
   ;
 StatementList: Statement SEMICOLON
     {
-
+      $$ = new nonTerm();
+      $$->code = $1->code;
     }
   | StatementList Statement SEMICOLON
     {
-
+      $$ = new nonTerm();
+      stringstream ss;
+      ss << $1->code << endl << $2->code;
+      $$->code = ss.str();
     }
   ;
 
@@ -406,18 +444,14 @@ TermInner: Var
 /* Var */
 Var: Identifier
     {
-      // string temp_var = makeTemp();
+      // Neal's code
+      // $$ = new nonTerm();
       // stringstream ss;
       // ss << $1->code;
-      // ss << ". " << temp_var;
-      // ss << temp_var << " " << $1->ret_name;
       // $$->code = ss.str();
-      // $$->ret_name = temp_var; 
-
+      
       $$ = new nonTerm();
-      stringstream ss;
-      ss << $1->code;
-      $$->code = ss.str();
+      $$->code = $1->code;
     }
   | Identifier L_SQUARE_BRACKET Expression R_SQUARE_BRACKET
     {
@@ -429,43 +463,58 @@ Var: Identifier
       // $$->code = ss.str();
       // $$->ret_name = temp_var;
 
+      // Neal's code
+      // $$ = new nonTerm();
+      // stringstream ss;
+      // ss << $1->code << ", " << $3->code;
+      // $$->code = ss.str();
+
       $$ = new nonTerm();
       stringstream ss;
-      ss << $1->code << ", " << $3->code;
+      ss << $1->code << "[" << $3 << "]";
       $$->code = ss.str();
     }
   ;
 VarList: Var
     {
+      // Neal's code
+      // $$ = new nonTerm();
+      // stringstream ss;
+
+      // if ($1->code.find("[")) {
+      //     ss << ".[] ";
+      //   }
+      // else {
+      //     ss << ".| ";
+      //   }
+
+      // ss << $1->code << endl;
+      // $$->code = ss.str();
 
       $$ = new nonTerm();
       stringstream ss;
-
-      if ($1->code.find("[")) {
-          ss << ".[] ";
-        }
-      else {
-          ss << ".| ";
-        }
-
-      ss << $1->code << endl;
+      ss << "_" << $1->code;
       $$->code = ss.str();
-
     }
   | Var COMMA VarList
     {
+      // Neal's code
+      // $$ = new nonTerm();
+      // stringstream ss;
+
+      // if ($1->code.find("[")) {
+      //   ss << ".[] ";
+      // }
+      // else {
+      //   ss << ".| ";
+      // }
+
+      // ss << $1->code << ", " << $3->code << endl;
+      // $$->code = ss.str();
+
       $$ = new nonTerm();
       stringstream ss;
-
-      if ($1->code.find("[")) {
-          ss << ".[] ";
-        }
-      else {
-          ss << ".| ";
-        }
-
-      //ss << $1->code << endl << $3->code;
-      ss << $1->code << ", " << $3->code << endl;
+      ss << "_" << $1->code << "," << $3->code;
       $$->code = ss.str();
     }
   ;
