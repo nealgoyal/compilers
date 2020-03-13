@@ -452,14 +452,50 @@ Statement: Var ASSIGN Expression
     }
   | RETURN Expression
     {
+      // $$ = new nonTerm();
+      // stringstream ss;
+
+      // ss << $2->code << endl;
+      // ss << "ret " << $2->ret_name;
+      
+      // $$->code = ss.str();
+      // $$->ret_name = $2->ret_name;
       $$ = new nonTerm();
       stringstream ss;
 
-      ss << $2->code << endl;
-      ss << "ret " << $2->ret_name;
+      string returnOp;
+
+      if ($2->ret_name != "") {
+        // $1 is var or expression
+        ss << $2->code << endl;
+        returnOp = $2->ret_name;
+
+      }
+      else {
+        // $2 is num : need to make new temp
+        returnOp = makeTemp();
+        ss << ". " << returnOp << endl;
+        ss << "= " << returnOp << ", " << $2->code << endl;
+      }
+
+      ss << "ret " << returnOp;
       
       $$->code = ss.str();
-      $$->ret_name = $2->ret_name;
+      $$->ret_name = returnOp;
+
+
+      // if ($3->ret_name != "") {
+      //   ss << $3->code << endl;
+      //   ss << ". " << addResult << endl;
+      //   ss << "+ " << addResult << ", " << firstOp << ", " << $3->ret_name;  
+      // }
+      // else {
+      //   ss << ". " << addResult << endl;
+      //   ss << "+ " << addResult << ", " << firstOp << ", " << $3->code;
+      // }
+
+      // $$->code = ss.str();
+      // $$->ret_name = addResult;
     }
   ;
 StatementList: Statement SEMICOLON
@@ -536,24 +572,47 @@ RelationExpr: Relations
   ;
 Relations: Expression Comp Expression
     {
-      // string temp_var = makeTemp();
-      // stringstream ss;
-      // ss << $1->code << "\n" << $3->code;
-      // ss << ". " << temp_var;
-      // ss << $2->value << " " << temp_var << ", " << $1->ret_name << ", " << $3->ret_name;
-      // $$->code = ss.str();
-      // $$->ret_name = temp_var;
-
+      // FIXME : implement similar logic for number comparisons as add/sub/mult/etc
       $$ = new nonTerm();
-      string resultTemp = makeTemp();
+      string compResult = makeTemp();
       stringstream ss;
+      string firstOp;
 
-      ss << $1->code << endl << $3->code << endl;
-      ss << ". " << resultTemp << endl;
-      ss << $2 << " " << resultTemp << ", " << $1->ret_name << ", " << $3->ret_name;
+      if ($1->ret_name != "") {
+        // $1 is var or expression
+        ss << $1->code << endl;
+        firstOp = $1->ret_name;
+
+      }
+      else {
+        // $1 is num
+        firstOp = $1->code; // set op to number
+      }
+
+
+      if ($3->ret_name != "") {
+        ss << $3->code << endl;
+        ss << ". " << compResult << endl;
+        ss << $2 << compResult << ", " << firstOp << ", " << $3->ret_name;  
+      }
+      else {
+        ss << ". " << compResult << endl;
+        ss << $2 << compResult << ", " << firstOp << ", " << $3->code;
+      }
 
       $$->code = ss.str();
-      $$->ret_name = resultTemp;
+      $$->ret_name = compResult;
+
+      // $$ = new nonTerm();
+      // string resultTemp = makeTemp();
+      // stringstream ss;
+
+      // ss << $1->code << endl << $3->code << endl;
+      // ss << ". " << resultTemp << endl;
+      // ss << $2 << " " << resultTemp << ", " << $1->ret_name << ", " << $3->ret_name;
+
+      // $$->code = ss.str();
+      // $$->ret_name = resultTemp;
     }
   | TRUE
     {
