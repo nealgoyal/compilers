@@ -12,6 +12,7 @@
 %{
   #include "stdio.h"
   #include <string>
+  #include <vector>
   #include <iostream>
   #include <sstream>
   using namespace std;
@@ -24,6 +25,7 @@
   string findIndex (const string&);
   bool continueCheck (const string &ref);
   void replaceString(string&, const string&, const string&);
+  bool varDeclared(const vector<string>&, const string&);
   extern FILE* yyin;
   
 %}
@@ -310,7 +312,7 @@ Statement: Var ASSIGN Expression
       string endLabel = makeLabel();
       stringstream ss;
 
-      // while find("continue") != ::npos => replace with ":= conditionalLabel"
+      // change all continue statements to goto outputs
       string replaceContinue = ":= " + conditionalLabel;
       replaceString($4->code, "continue", replaceContinue);
 
@@ -332,6 +334,10 @@ Statement: Var ASSIGN Expression
       string conditionalLabel = makeLabel();
       stringstream ss;
 
+      // change all continue statements to goto outputs
+      string replaceContinue = ":= " + conditionalLabel;
+      replaceString($3->code, "continue", replaceContinue);
+
       ss << ": " << startLabel << endl; // mark loop start label
       ss << $3->code << endl;
       ss << ": " << conditionalLabel << endl;
@@ -348,11 +354,24 @@ Statement: Var ASSIGN Expression
       string endLabel = makeLabel();
       string loopVariable = makeTemp();
       stringstream ss;
+
+      // change all continue statements to goto outputs
+      string replaceContinue = ":= " + conditionalLabel;
+      replaceString($12->code, "continue", replaceContinue);
       
       ss << "= " << loopVariable << ", " << $4 << endl; // __temp__ = loop variable
       ss << ": " << conditionalLabel << endl;
       ss << $6->code << endl; // loop condition code
-      ss << "?:= " << startLabel << ", " << $6->ret_name << endl;
+      ss << "?:= " << startLabel << ", " << $6->ret_name << endl; // go to loop start if true
+      ss << ":= " << endLabel << endl; // exit if false
+      ss << ": " << startLabel << endl;
+      ss << $12->code << endl;
+      ss << $10->code << endl; // increment loop variable - expression code
+      ss << "= " << loopVariable << ", " << $10->ret_name << endl; // set loop variable equal to incremental expression
+      ss << ":= " << conditionalLabel << endl; // re-evaluate loop conditions
+      ss << ": " << endLabel;
+
+      $$->code = ss.str();
     }
   | READ VarList
     {
@@ -462,8 +481,8 @@ BoolExpr: BoolExpr OR RelationAndExpr
     {
       $$ = new nonTerm();
       string returnName = makeTemp(); // OR statement result location
-      
       stringstream ss;
+
       ss << $1->code << endl << $3->code << endl; // Add nested expression code to the stream
       ss << ". " << returnName << endl; // Add new return name to the output
       ss << "|| " << returnName << ", " << $1->ret_name << ", " << $3->ret_name; // Add the logical OR statement
@@ -539,12 +558,24 @@ Relations: Expression Comp Expression
   | TRUE
     {
       $$ = new nonTerm();
-      $$->code = "1";
+      string trueTemp = makeTemp();
+      stringstream ss;
+
+      ss << ". " << trueTemp << endl;
+      ss << "= " << trueTemp << ", 1";
+      $$->code = ss.str();
+      $$->ret_name = trueTemp;
     }
   | FALSE
     {
       $$ = new nonTerm();
-      $$->code = "0";
+      string falseTemp = makeTemp();
+      stringstream ss;
+
+      ss << ". " << falseTemp << endl;
+      ss << "= " << falseTemp << ", 0";
+      $$->code = ss.str();
+      $$->ret_name = falseTemp;
     }
   | L_PAREN BoolExpr R_PAREN
     {
@@ -630,7 +661,7 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
 
       ss << $1->code << endl << $3->code << endl;
       ss << ". " << multResult << endl;
-      ss << "* " << multResult << $1->ret_name << ", " << $3->ret_name;
+      ss << "* " << multResult << ", " << $1->ret_name << ", " << $3->ret_name;
 
       $$->code = ss.str();
       $$->ret_name = multResult;
@@ -643,7 +674,7 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
 
       ss << $1->code << endl << $3->code << endl;
       ss << ". " << divResult << endl;
-      ss << "/ " << divResult << $1->ret_name << ", " << $3->ret_name;
+      ss << "/ " << divResult << ", " << $1->ret_name << ", " << $3->ret_name;
 
       $$->code = ss.str();
       $$->ret_name = divResult;
@@ -654,9 +685,17 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       string modResult = makeTemp();
       stringstream ss;
 
-      ss << $1->code << endl << $3->code << endl;
-      ss << ". " << modResult << endl;
-      ss << "% " << modResult << $1->ret_name << ", " << $3->ret_name;
+      ss << $1->code;
+
+      if ($3->ret_name != "") {
+        ss << $3->code << endl;
+        ss << ". " << modResult << endl;
+        ss << "% " << modResult << ", " << $1->ret_name << ", " << $3->ret_name;  
+      }
+      else {
+        ss << endl << ". " << modResult << endl;
+        ss << "% " << modResult << ", " << $1->ret_name << ", " << $3->code;
+      }
 
       $$->code = ss.str();
       $$->ret_name = modResult;
@@ -741,7 +780,8 @@ TermInner: Var
       // $2->code == evalutated expression
       $$ = new nonTerm();
       stringstream ss;
-      ss << "(" << $2 << ")";
+      // ss << "(" << $2 << ")";
+      ss << $2->code << endl; // add expression code block to output
       $$->code = ss.str();
     }
   ;
@@ -755,6 +795,13 @@ Var: Identifier
       // ss << $1->code;
       // $$->code = ss.str();
       
+      // check if var is in symbol table, if not exit (currLine should be correct)
+      // if (!varDeclared) {
+      //   stringstream er;
+      //   er << "used variable \"" << $1->code << "\" was not previously declared"; 
+      //   yyerror(er.str());
+      // }
+
       $$ = new nonTerm();
       $$->code = $1->code;
     }
@@ -834,11 +881,22 @@ void replaceString(string& str, const string& oldStr, const string& newStr) {
   }
 }
 
+bool varDeclared(const vector<string>& symbolTable, const string& var) {
+  for (unsigned i = 0; i < symbolTable.size(); ++i) {
+    if (symbolTable.at(i) == var) {
+      return true;
+    }
+  }
+  // not found in symbol table
+  return false;
+}
+
 int yyerror(string s) {
   extern int currLine, currPos;
   extern char *yytext;
 
-  cout << "ERROR " << s << " : at symbol " << yytext << " on line " << currLine << ", column " << currPos << endl;
+  cout << "Error line: " << currLine << ": " << s << endl;
+  // cout << "ERROR " << s << " : at symbol " << yytext << " on line " << currLine << ", column " << currPos << endl;
   // printf("ERROR %s at symbol \"%s\" on line %s, column %s\n"), (s, yytext, currLine, currPos);
   exit(1);
 }
