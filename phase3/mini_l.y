@@ -452,14 +452,6 @@ Statement: Var ASSIGN Expression
     }
   | RETURN Expression
     {
-      // $$ = new nonTerm();
-      // stringstream ss;
-
-      // ss << $2->code << endl;
-      // ss << "ret " << $2->ret_name;
-      
-      // $$->code = ss.str();
-      // $$->ret_name = $2->ret_name;
       $$ = new nonTerm();
       stringstream ss;
 
@@ -482,20 +474,6 @@ Statement: Var ASSIGN Expression
       
       $$->code = ss.str();
       $$->ret_name = returnOp;
-
-
-      // if ($3->ret_name != "") {
-      //   ss << $3->code << endl;
-      //   ss << ". " << addResult << endl;
-      //   ss << "+ " << addResult << ", " << firstOp << ", " << $3->ret_name;  
-      // }
-      // else {
-      //   ss << ". " << addResult << endl;
-      //   ss << "+ " << addResult << ", " << firstOp << ", " << $3->code;
-      // }
-
-      // $$->code = ss.str();
-      // $$->ret_name = addResult;
     }
   ;
 StatementList: Statement SEMICOLON
@@ -572,7 +550,6 @@ RelationExpr: Relations
   ;
 Relations: Expression Comp Expression
     {
-      // FIXME : implement similar logic for number comparisons as add/sub/mult/etc
       $$ = new nonTerm();
       string compResult = makeTemp();
       stringstream ss;
@@ -589,7 +566,6 @@ Relations: Expression Comp Expression
         firstOp = $1->code; // set op to number
       }
 
-
       if ($3->ret_name != "") {
         ss << $3->code << endl;
         ss << ". " << compResult << endl;
@@ -602,17 +578,6 @@ Relations: Expression Comp Expression
 
       $$->code = ss.str();
       $$->ret_name = compResult;
-
-      // $$ = new nonTerm();
-      // string resultTemp = makeTemp();
-      // stringstream ss;
-
-      // ss << $1->code << endl << $3->code << endl;
-      // ss << ". " << resultTemp << endl;
-      // ss << $2 << " " << resultTemp << ", " << $1->ret_name << ", " << $3->ret_name;
-
-      // $$->code = ss.str();
-      // $$->ret_name = resultTemp;
     }
   | TRUE
     {
@@ -645,12 +610,12 @@ Relations: Expression Comp Expression
   ;
 
 /* Comp */
-Comp: EQ {}
-  | NEQ {}
-  | LT {}
-  | GT {}
-  | LTE {}
-  | GTE {}
+Comp: EQ {/* pass value directly as $$ */}
+  | NEQ {/* pass value directly as $$ */}
+  | LT {/* pass value directly as $$ */}
+  | GT {/* pass value directly as $$ */}
+  | LTE {/* pass value directly as $$ */}
+  | GTE {/* pass value directly as $$ */}
   ;
 
 /* Expression */
@@ -849,25 +814,8 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
   | Term
     {
       $$ = new nonTerm();
-      
-      // if ($1->ret_name != "") {
-      //   $$->code = $1->code;
-      //   $$->ret_name = $1->ret_name;
-      // }
-      // else {
-      //   string newTemp = makeTemp();
-      //   stringstream ss;
-
-      //   ss << ". " << newTemp << endl;
-      //   ss << "= " << newTemp << ", " << $1->code;
-
-      //   $$->code = ss.str();
-      //   $$->ret_name = newTemp;
-      // }
-
       $$->code = $1->code;
       $$->ret_name = $1->ret_name;
-
     }
   ;
 
@@ -876,20 +824,6 @@ Term: TermInner
     {
       $$ = new nonTerm();
 
-      // if ($1->ret_name != "") {
-      //   string loadIdent = makeTemp();
-      //   stringstream ss;
-      //   ss << $1->code << endl;
-      //   ss << ". " << loadIdent << endl;
-      //   ss << "= " << loadIdent << ", " << $1->ret_name;
-
-      //   $$->code = ss.str();
-      //   $$->ret_name = loadIdent;
-      // }
-      // else {
-      //   $$->code = $1->code;
-      //   $$->ret_name = $1->ret_name;
-      // }
       if ($1->ret_name == "var") {
         // is var
         string newTemp = makeTemp();
@@ -912,6 +846,7 @@ Term: TermInner
     }
   | SUB TermInner
     {
+      // FIXME
       $$ = new nonTerm();
       stringstream ss;
       ss << "- " << $2->code; // FIXME : evaluate termInner as above and take ret_name and negate
@@ -919,7 +854,6 @@ Term: TermInner
     }
   | Identifier L_PAREN ExpressionList R_PAREN
     {
-      // fibinocci(k-1) + fibinocci(k-2)
       $$ = new nonTerm();
       string newTemp = makeTemp();
       stringstream ss, sret;
@@ -975,19 +909,6 @@ TermInner: Var
 /* Var */
 Var: Identifier
     {
-      // Neal's code
-      // $$ = new nonTerm();
-      // stringstream ss;
-      // ss << $1->code;
-      // $$->code = ss.str();
-      
-      // check if var is in symbol table, if not exit (currLine should be correct)
-      // if (!varDeclared) {
-      //   stringstream er;
-      //   er << "used variable \"" << $1->code << "\" was not previously declared"; 
-      //   yyerror(er.str());
-      // }
-
       $$ = new nonTerm();
       $$->code = $1->code;
     }
