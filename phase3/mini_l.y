@@ -600,10 +600,29 @@ Expression: Expression ADD MultiplicativeExpr
       $$ = new nonTerm();
       string addResult = makeTemp();
       stringstream ss;
+      string firstOp;
 
-      ss << $1->code << endl << $3->code << endl;
-      ss << ". " << addResult << endl;
-      ss << "+ " << addResult << ", " << $1->ret_name << ", " << $3->ret_name;
+      if ($1->ret_name != "") {
+        // $1 is var or expression
+        ss << $1->code << endl;
+        firstOp = $1->ret_name;
+
+      }
+      else {
+        // $1 is num
+        firstOp = $1->code; // set op to number
+      }
+
+
+      if ($3->ret_name != "") {
+        ss << $3->code << endl;
+        ss << ". " << addResult << endl;
+        ss << "+ " << addResult << ", " << firstOp << ", " << $3->ret_name;  
+      }
+      else {
+        ss << ". " << addResult << endl;
+        ss << "+ " << addResult << ", " << firstOp << ", " << $3->code;
+      }
 
       $$->code = ss.str();
       $$->ret_name = addResult;
@@ -613,10 +632,29 @@ Expression: Expression ADD MultiplicativeExpr
       $$ = new nonTerm();
       string subResult = makeTemp();
       stringstream ss;
+      string firstOp;
 
-      ss << $1->code << endl << $3->code << endl;
-      ss << ". " << subResult << endl;
-      ss << "- " << subResult << ", " << $1->ret_name << ", " << $3->ret_name;
+      if ($1->ret_name != "") {
+        // $1 is var or expression
+        ss << $1->code << endl;
+        firstOp = $1->ret_name;
+
+      }
+      else {
+        // $1 is num
+        firstOp = $1->code; // set op to number
+      }
+
+
+      if ($3->ret_name != "") {
+        ss << $3->code << endl;
+        ss << ". " << subResult << endl;
+        ss << "- " << subResult << ", " << firstOp << ", " << $3->ret_name;  
+      }
+      else {
+        ss << ". " << subResult << endl;
+        ss << "- " << subResult << ", " << firstOp << ", " << $3->code;
+      }
 
       $$->code = ss.str();
       $$->ret_name = subResult;
@@ -658,10 +696,29 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       $$ = new nonTerm();
       string multResult = makeTemp();
       stringstream ss;
+      string firstOp;
 
-      ss << $1->code << endl << $3->code << endl;
-      ss << ". " << multResult << endl;
-      ss << "* " << multResult << ", " << $1->ret_name << ", " << $3->ret_name;
+      if ($1->ret_name != "") {
+        // $1 is var or expression
+        ss << $1->code << endl;
+        firstOp = $1->ret_name;
+
+      }
+      else {
+        // $1 is num
+        firstOp = $1->code; // set op to number
+      }
+
+
+      if ($3->ret_name != "") {
+        ss << $3->code << endl;
+        ss << ". " << multResult << endl;
+        ss << "* " << multResult << ", " << firstOp << ", " << $3->ret_name;  
+      }
+      else {
+        ss << ". " << multResult << endl;
+        ss << "* " << multResult << ", " << firstOp << ", " << $3->code;
+      }
 
       $$->code = ss.str();
       $$->ret_name = multResult;
@@ -671,10 +728,29 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       $$ = new nonTerm();
       string divResult = makeTemp();
       stringstream ss;
+      string firstOp;
 
-      ss << $1->code << endl << $3->code << endl;
-      ss << ". " << divResult << endl;
-      ss << "/ " << divResult << ", " << $1->ret_name << ", " << $3->ret_name;
+      if ($1->ret_name != "") {
+        // $1 is var or expression
+        ss << $1->code << endl;
+        firstOp = $1->ret_name;
+
+      }
+      else {
+        // $1 is num
+        firstOp = $1->code; // set op to number
+      }
+
+
+      if ($3->ret_name != "") {
+        ss << $3->code << endl;
+        ss << ". " << divResult << endl;
+        ss << "/ " << divResult << ", " << firstOp << ", " << $3->ret_name;  
+      }
+      else {
+        ss << ". " << divResult << endl;
+        ss << "/ " << divResult << ", " << firstOp << ", " << $3->code;
+      }
 
       $$->code = ss.str();
       $$->ret_name = divResult;
@@ -684,17 +760,28 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
       $$ = new nonTerm();
       string modResult = makeTemp();
       stringstream ss;
+      string firstOp;
 
-      ss << $1->code;
+      if ($1->ret_name != "") {
+        // $1 is var or expression
+        ss << $1->code << endl;
+        firstOp = $1->ret_name;
+
+      }
+      else {
+        // $1 is num
+        firstOp = $1->code; // set op to number
+      }
+
 
       if ($3->ret_name != "") {
         ss << $3->code << endl;
         ss << ". " << modResult << endl;
-        ss << "% " << modResult << ", " << $1->ret_name << ", " << $3->ret_name;  
+        ss << "% " << modResult << ", " << firstOp << ", " << $3->ret_name;  
       }
       else {
-        ss << endl << ". " << modResult << endl;
-        ss << "% " << modResult << ", " << $1->ret_name << ", " << $3->code;
+        ss << ". " << modResult << endl;
+        ss << "% " << modResult << ", " << firstOp << ", " << $3->code;
       }
 
       $$->code = ss.str();
@@ -704,20 +791,24 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
     {
       $$ = new nonTerm();
       
-      if ($1->ret_name != "") {
-        $$->code = $1->code;
-        $$->ret_name = $1->ret_name;
-      }
-      else {
-        string newTemp = makeTemp();
-        stringstream ss;
+      // if ($1->ret_name != "") {
+      //   $$->code = $1->code;
+      //   $$->ret_name = $1->ret_name;
+      // }
+      // else {
+      //   string newTemp = makeTemp();
+      //   stringstream ss;
 
-        ss << ". " << newTemp << endl;
-        ss << "= " << newTemp << ", " << $1->code;
+      //   ss << ". " << newTemp << endl;
+      //   ss << "= " << newTemp << ", " << $1->code;
 
-        $$->code = ss.str();
-        $$->ret_name = newTemp;
-      }
+      //   $$->code = ss.str();
+      //   $$->ret_name = newTemp;
+      // }
+
+      $$->code = $1->code;
+      $$->ret_name = $1->ret_name;
+
     }
   ;
 
@@ -725,13 +816,46 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
 Term: TermInner
     {
       $$ = new nonTerm();
-      $$->code = $1->code;
+
+      // if ($1->ret_name != "") {
+      //   string loadIdent = makeTemp();
+      //   stringstream ss;
+      //   ss << $1->code << endl;
+      //   ss << ". " << loadIdent << endl;
+      //   ss << "= " << loadIdent << ", " << $1->ret_name;
+
+      //   $$->code = ss.str();
+      //   $$->ret_name = loadIdent;
+      // }
+      // else {
+      //   $$->code = $1->code;
+      //   $$->ret_name = $1->ret_name;
+      // }
+      if ($1->ret_name == "var") {
+        // is var
+        string newTemp = makeTemp();
+        stringstream ss;
+        
+        ss << ". " << newTemp << endl;
+        ss << "= " << newTemp << ", " << $1->code;
+
+        $$->code = ss.str();
+        $$->ret_name = newTemp;
+      }
+      else if ($1->ret_name == "num") {
+        $$->code = $1->code;
+        $$->ret_name = "";
+      }
+      else {
+        $$->code = $1->code;
+        $$->ret_name = $1->ret_name;
+      }
     }
   | SUB TermInner
     {
       $$ = new nonTerm();
       stringstream ss;
-      ss << "- " << $2->code;
+      ss << "- " << $2->code; // FIXME : evaluate termInner as above and take ret_name and negate
       $$->code = ss.str();
     }
   | Identifier L_PAREN ExpressionList R_PAREN
@@ -769,20 +893,23 @@ TermInner: Var
     {
       $$ = new nonTerm();
       $$->code = $1->code;
+      $$->ret_name = "var";
     }
   | NUMBER
     {
       $$ = new nonTerm();
       $$->code = to_string($1);
+      $$->ret_name = "num";
     }
   | L_PAREN Expression R_PAREN
     {
       // $2->code == evalutated expression
       $$ = new nonTerm();
       stringstream ss;
-      // ss << "(" << $2 << ")";
-      ss << $2->code << endl; // add expression code block to output
+
+      ss << $2->code; // add expression code block to output
       $$->code = ss.str();
+      $$->ret_name = $2->ret_name;
     }
   ;
 
