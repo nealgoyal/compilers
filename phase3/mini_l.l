@@ -4,6 +4,7 @@
   using namespace std;
   extern int yyerror(char *s);
   int currLine, currPos = 1;
+  char * file;
 %}
 
 DIGIT [0-9]
@@ -89,6 +90,7 @@ int main(int argc, char **argv) {
   else {
     yyin = stdin;
   }
+  file = strdup(argv[1]);
 
   yyparse();
   return 0;
