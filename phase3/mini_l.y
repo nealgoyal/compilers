@@ -416,28 +416,51 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
 /* Term */
 Term: TermInner
     {
-
+      $$ = new nonTerm();
+      $$->code = $1->code;
     }
   | SUB TermInner
     {
-
+      $$ = new nonTerm();
+      stringstream ss;
+      ss << "- " << $2->code;
+      $$->code = ss.str();
     }
   | Identifier L_PAREN ExpressionList R_PAREN
     {
-
+      $$ = new nonTerm();
+      stringstream ss;
+      ss << $1->code << "(" << $3 << ")";
+      $$->code = ss.str();
     }
   ;
 TermInner: Var
     {
+      // $$ = new nonTerm();
+      // stringstream ss;
+      // string temp = "";
+      // for (unsigned i = 0; i < $1->code.length(); ++i) {
+      //   if ($1->code.at(i) == '[') {
+      //     ss << endl << ". ";
+      //   }
+
+      // ss << $1->code << ". " << endl << "=[] " << ", ";
 
     }
   | NUMBER
     {
-      
+      $$ = new nonTerm();
+      stringstream ss;
+      ss << to_string($1);
+      $$->code = ss.str();
     }
   | L_PAREN Expression R_PAREN
     {
       // $2->code == evalutated expression
+      $$ = new nonTerm();
+      stringstream ss;
+      ss << "(" << $2 << ")";
+      $$->code = ss.str();
     }
   ;
 
