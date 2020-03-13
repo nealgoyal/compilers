@@ -5,7 +5,9 @@
   struct nonTerm {
     string code;
     string ret_name;
-    string value;
+    bool isArray;
+    string var;
+    string index;
   };
 }
 
@@ -264,9 +266,27 @@ Statement: Var ASSIGN Expression
     {
       $$ = new nonTerm();
       stringstream ss;
+      string assign;
 
-      ss << $3->code << endl;
-      ss << "= " << $1->code << ", " << $3->ret_name;
+      if ($3->ret_name != "") {
+        // assign to expression result
+        ss << $3->code << endl;
+        assign = $3->ret_name;
+      }
+      else {
+        // expression is var or num
+        assign = $3->code;
+      }
+
+      if ($1->isArray) {
+        if ($1->code.length() > 0) {
+          ss << $1->code << endl;
+        }
+        ss << "[]= " << $1->var << ", " << $1->index << ", " << assign;
+      }
+      else {
+        ss << "= " << $1->code << ", " << assign;
+      }
 
       $$->code = ss.str();
       $$->ret_name = $1->code;
@@ -829,8 +849,16 @@ Term: TermInner
         string newTemp = makeTemp();
         stringstream ss;
         
-        ss << ". " << newTemp << endl;
-        ss << "= " << newTemp << ", " << $1->code;
+        if ($1->isArray) {
+          // FIXME
+          // _ident[x]
+          // ss << ".[] " 
+          // ss << "=[] " << 
+        }
+        else {
+          ss << ". " << newTemp << endl; // create new temp
+          ss << "= " << newTemp << ", " << $1->code;
+        }
 
         $$->code = ss.str();
         $$->ret_name = newTemp;
@@ -846,7 +874,7 @@ Term: TermInner
     }
   | SUB TermInner
     {
-      // FIXME
+      // FIXME : same as TermInner but add "! dst, src" after
       $$ = new nonTerm();
       stringstream ss;
       ss << "- " << $2->code; // FIXME : evaluate termInner as above and take ret_name and negate
@@ -887,6 +915,7 @@ TermInner: Var
       $$ = new nonTerm();
       $$->code = $1->code;
       $$->ret_name = "var";
+      $$->isArray = $1->isArray;
     }
   | NUMBER
     {
@@ -911,9 +940,11 @@ Var: Identifier
     {
       $$ = new nonTerm();
       $$->code = $1->code;
+      $$->isArray = false;
     }
   | Identifier L_SQUARE_BRACKET Expression R_SQUARE_BRACKET
     {
+      // cout << $3->code << " : " << $3->ret_name << endl;
       // Neal's code
       // $$ = new nonTerm();
       // stringstream ss;
@@ -921,9 +952,22 @@ Var: Identifier
       // $$->code = ss.str();
 
       $$ = new nonTerm();
-      stringstream ss;
-      ss << $1->code << "[" << $3 << "]";
-      $$->code = ss.str();
+      string index, code = "";
+
+      if ($3->ret_name != "") {
+        // $3 is var or expression
+        code = $3->code;
+        index = $3->ret_name;
+      }
+      else {
+        // $1 is num
+        index = $3->code; // set op to number
+      }
+
+      $$->code = code;
+      $$->isArray = true;
+      $$->var = $1->code;
+      $$->index = index;
     }
   ;
 VarList: Var
@@ -932,6 +976,7 @@ VarList: Var
       stringstream ss;
       ss << "_" << $1->code;
       $$->code = ss.str();
+      $$->isArray = $1->isArray;
     }
   | Var COMMA VarList
     {
@@ -939,6 +984,20 @@ VarList: Var
       stringstream ss;
       ss << "_" << $1->code << "," << $3->code;
       $$->code = ss.str();
+
+      if ($1->isArray != $3->isArray) {
+        stringstream er;
+        er << "variable \"" << $1->code << "\" is of type ";
+        if ($1->isArray) {
+          er << "array.";
+        }
+        else {
+          er << "integer.";
+        }
+
+        yyerror(er.str());
+      }
+      $$->isArray = $1->isArray;
     }
   ;
 
