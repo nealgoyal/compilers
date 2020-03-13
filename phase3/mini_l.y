@@ -567,11 +567,15 @@ MultiplicativeExpr: MultiplicativeExpr MULT Term
 /* Term */
 Term: TermInner
     {
-
+      $$ = new nonTerm();
+      $$->code = $1->code;
     }
   | SUB TermInner
     {
-
+      $$ = new nonTerm();
+      stringstream ss;
+      ss << "- " << $2->code;
+      $$->code = ss.str();
     }
   | Identifier L_PAREN ExpressionList R_PAREN
     {
@@ -602,6 +606,10 @@ TermInner: Var
   | L_PAREN Expression R_PAREN
     {
       // $2->code == evalutated expression
+      $$ = new nonTerm();
+      stringstream ss;
+      ss << "(" << $2 << ")";
+      $$->code = ss.str();
     }
   ;
 
