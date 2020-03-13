@@ -851,9 +851,12 @@ Term: TermInner
         
         if ($1->isArray) {
           // FIXME
-          // _ident[x]
-          // ss << ".[] " 
-          // ss << "=[] " << 
+          if ($1->code.length() > 0) {
+            ss << $1->code << endl;
+          }
+          ss << "=[] " << newTemp << ", " << $1->var << ", " << $1->index;
+          $$->var = $1->var;
+          $$->index = $1->index;
         }
         else {
           ss << ". " << newTemp << endl; // create new temp
@@ -916,6 +919,8 @@ TermInner: Var
       $$->code = $1->code;
       $$->ret_name = "var";
       $$->isArray = $1->isArray;
+      $$->var = $1->var;
+      $$->index = $1->index;
     }
   | NUMBER
     {
