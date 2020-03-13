@@ -23,6 +23,7 @@
   string createVar(char*);
   string findIndex (const string&);
   bool continueCheck (const string &ref);
+  void replaceString(string&, const string&, const string&);
   extern FILE* yyin;
   
 %}
@@ -261,7 +262,7 @@ Statement: Var ASSIGN Expression
     {
       $$ = new nonTerm();
       stringstream ss;
-      
+
       ss << $3->code << endl;
       ss << "= " << $1->code << ", " << $3->ret_name;
 
@@ -310,6 +311,8 @@ Statement: Var ASSIGN Expression
       stringstream ss;
 
       // while find("continue") != ::npos => replace with ":= conditionalLabel"
+      string replaceContinue = ":= " + conditionalLabel;
+      replaceString($4->code, "continue", replaceContinue);
 
       ss << ": " << conditionalLabel << endl; // begin while loop
       ss << $2->code << endl; // add condtional statements
@@ -821,6 +824,14 @@ bool continueCheck (const string &ref) {
     return false;
   }
   return true;
+}
+
+void replaceString(string& str, const string& oldStr, const string& newStr) {
+  string::size_type pos = 0u;
+  while((pos = str.find(oldStr, pos)) != string::npos){
+     str.replace(pos, oldStr.length(), newStr);
+     pos += newStr.length();
+  }
 }
 
 int yyerror(string s) {
