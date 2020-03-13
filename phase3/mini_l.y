@@ -944,7 +944,10 @@ TermInner: Var
 Var: Identifier
     {
       $$ = new nonTerm();
-      $$->code = $1->code;
+      stringstream ss;
+      ss << "_" << $1->code;
+      $$->code = ss.str();
+      $$->var = ss.str();
       $$->isArray = false;
     }
   | Identifier L_SQUARE_BRACKET Expression R_SQUARE_BRACKET
@@ -957,6 +960,7 @@ Var: Identifier
       // $$->code = ss.str();
 
       $$ = new nonTerm();
+      stringstream ss;
       string index, code = "";
 
       if ($3->ret_name != "") {
@@ -969,9 +973,11 @@ Var: Identifier
         index = $3->code; // set op to number
       }
 
+      ss << "_" << $1->code;
+
       $$->code = code;
       $$->isArray = true;
-      $$->var = $1->code;
+      $$->var = ss.str();
       $$->index = index;
     }
   ;
@@ -979,15 +985,14 @@ VarList: Var
     {
       $$ = new nonTerm();
       stringstream ss;
-      ss << "_" << $1->code;
-      $$->code = ss.str();
+      $$->code = $1->var;
       $$->isArray = $1->isArray;
     }
   | Var COMMA VarList
     {
       $$ = new nonTerm();
       stringstream ss;
-      ss << "_" << $1->code << "," << $3->code;
+      ss << $1->var << "," << $3->var;
       $$->code = ss.str();
 
       if ($1->isArray != $3->isArray) {
