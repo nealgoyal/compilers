@@ -29,10 +29,13 @@
   bool continueCheck (const string &ref);
   void replaceString(string&, const string&, const string&);
   bool varDeclared(const vector<string>&, const string&);
+  void addLocalVar(const string&);
   bool mainCheck = false;
   extern FILE* yyin;
-  extern char* file;
-  map<string, int> symbols;  
+  // extern char* file;
+  // map<string, int> symbols;
+  vector<string> funcNames;
+  vector<string> varNames;
 %}
 %union {
   int int_val;
@@ -104,21 +107,21 @@ Program: FunctionList
     }
   | %empty 
     {
-      // Error 3 of 9: Not defining a main function.
-      if ( symbols.find("main") == symbols.end() ) {
-        printf("Not defining a main function.");
-        yyerror("Not defining a main function.");
-      }
+      // // Error 3 of 9: Not defining a main function.
+      // if ( symbols.find("main") == symbols.end() ) {
+      //   printf("Not defining a main function.");
+      //   yyerror("Not defining a main function.");
+      // }
 
        /* 
         Error 4 of 9:  
         Defining a variable more than once (it should also be an error to 
         declare a variable with the same name as the MINI-L program itself).
       */
-      if ( symbols.find(file) != symbols.end() ) {
-        printf("Error - program name same as variable");
-        yyerror("Error - program name same as variable");
-      }
+      // if ( symbols.find(file) != symbols.end() ) {
+      //   printf("Error - program name same as variable");
+      //   yyerror("Error - program name same as variable");
+      // }
 
       $$ = new nonTerm();
       cout << $$->code << endl;
@@ -166,6 +169,12 @@ Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBo
   ;
 FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
     {
+      cout << "varNames: " << endl;
+      for (unsigned i = 0; i < varNames.size(); ++i) {
+        cout << varNames.at(i) << endl;
+      }
+
+
       $$ = new nonTerm();
       stringstream ss;
       
@@ -243,16 +252,27 @@ DeclarationList: DeclarationList Declaration SEMICOLON
 Declaration: IdentifierList COLON INTEGER
     {
       $$ = new nonTerm();
-      stringstream ss;
-      ss << ". ";
+      stringstream ss, var;
+      string currVar = "";
+
+      // ss << ". ";
       for (unsigned i = 0; i < $1->code.length(); ++i) {
         if ($1->code.at(i) == ',') {
-          ss << endl << ". ";
+          ss << ". " << currVar << endl;
+          addLocalVar(currVar);
+          currVar = "";
         }
         else {
-          ss << $1->code.at(i);
+          // ss << $1->code.at(i);
+          currVar.push_back($1->code[i]);
         }
       }
+
+      if (currVar.length() > 0) {
+        ss << ". " << currVar;
+        addLocalVar(currVar);
+      }
+      
       $$->code = ss.str();
       $$->ret_name = $1->code; // pass identlist up
     }
@@ -261,24 +281,30 @@ Declaration: IdentifierList COLON INTEGER
       // Error 8 of 9: Declaring an array of size <= 0.
       string buffer;
       if ($5 <= 0) {
-        char buffer[100];
-        printf("ERROR - ARRAY size <= 1");
-        yyerror(buffer);
+        yyerror("array size < 1");
       }
 
       // FIXME
       $$ = new nonTerm();
       stringstream ss;
-      ss << ".[] ";
+      string currVar = "";
+
       for (unsigned i = 0; i < $1->code.length(); ++i) {
         if ($1->code.at(i) == ',') {
-          ss << ", " << to_string($5) << endl << ".[] ";
+          ss << ".[] " << currVar << ", " << to_string($5) << endl;
+          addLocalVar(currVar);
+          currVar = "";
         }
         else {
-          ss << $1->code.at(i);
+          currVar.push_back($1->code[i]);
         }
       }
-      ss << ", " << to_string($5);
+
+      if (currVar.length() > 0 ) {
+        ss << ".[] " << currVar << ", " << to_string($5);
+        addLocalVar(currVar);
+      }
+      
       $$->code = ss.str();
       $$->ret_name = $1->code; // pass identlist up
     }
@@ -303,13 +329,13 @@ Identifier: IDENT {
         Defining a variable more than once (it should also be an error to 
         declare a variable with the same name as the MINI-L program itself).
     */
-    if (symbols.find($1) != symbols.end()) {
-      printf("Error - Defining a variable more than once");
-      yyerror("Error - Defining a variable more than once");
-    }
-    else {
-      symbols.insert(pair<string,int>($1,0));
-    }
+    // if (symbols.find($1) != symbols.end()) {
+    //   printf("Error - Defining a variable more than once");
+    //   yyerror("Error - Defining a variable more than once");
+    // }
+    // else {
+    //   symbols.insert(pair<string,int>($1,0));
+    // }
 
     $$ = new nonTerm();
     $$->code = $1;
@@ -908,10 +934,10 @@ Term: TermInner
     {
 
       // Error 2 of 9: Calling a function which has not been defined.
-      if (symbols.find($1->code) == symbols.end()) {
-        printf("Error - Calling an undeclared function");
-        yyerror("Error - Calling an undeclared function");
-      }
+      // if (symbols.find($1->code) == symbols.end()) {
+      //   printf("Error - Calling an undeclared function");
+      //   yyerror("Error - Calling an undeclared function");
+      // }
 
       $$ = new nonTerm();
       string newTemp = makeTemp();
@@ -973,11 +999,11 @@ Var: Identifier
     {
 
        // Error 1 of 9: Using a variable without having first declared it.
-      if (symbols.find($1->code) == symbols.end()) 
-      {
-        printf("Error - Using an undeclared variable");
-        yyerror("Error - Using an undeclared variable");
-      }
+      // if (symbols.find($1->code) == symbols.end()) 
+      // {
+      //   printf("Error - Using an undeclared variable");
+      //   yyerror("Error - Using an undeclared variable");
+      // }
       /* 
         Error 6 of 9: 
         Forgetting to specify an array index when using an array variable 
@@ -1001,11 +1027,11 @@ Var: Identifier
   | Identifier L_SQUARE_BRACKET Expression R_SQUARE_BRACKET
     {
       // Error 1 of 9: Using a variable without having first declared it.
-      if (symbols.find($1->code) == symbols.end()) 
-      {
-        printf("Error - Using an undeclared variable");
-        yyerror("Error - Using an undeclared variable");
-      } 
+      // if (symbols.find($1->code) == symbols.end()) 
+      // {
+      //   printf("Error - Using an undeclared variable");
+      //   yyerror("Error - Using an undeclared variable");
+      // } 
 
       /* 
         Error 7 of 9: 
@@ -1127,6 +1153,17 @@ bool varDeclared(const vector<string>& symbolTable, const string& var) {
   }
   // not found in symbol table
   return false;
+}
+
+void addLocalVar(const string& var) {
+  for (unsigned i = 0; i < varNames.size(); ++i) {
+    if (varNames.at(i) == var) {
+      string errorString = "symbol \"" + var + "\" is multiply-defined.";
+      yyerror(errorString);
+    }
+  }
+  // var is not in varNames - add to varNames
+  varNames.push_back(var);
 }
 
 int yyerror(string s) {
