@@ -4,6 +4,7 @@
   using namespace std;
   extern int yyerror(char *s);
   int currLine, currPos = 1;
+  char * file;
 %}
 
 DIGIT [0-9]
@@ -45,12 +46,12 @@ LETTER [a-zA-Z]
 "/"               {currPos += yyleng; return DIV;}
 "%"               {currPos += yyleng; return MOD;}
 
-"=="              {currPos += yyleng; return EQ;}
-"<>"              {currPos += yyleng; return NEQ;}
-"<"               {currPos += yyleng; return LT;}
-">"               {currPos += yyleng; return GT;}
-"<="              {currPos += yyleng; return LTE;}
-">="              {currPos += yyleng; return GTE;}
+"=="              {yylval.str_val = strdup(yytext); currPos += yyleng; return EQ;}
+"<>"              {yylval.str_val = strdup(yytext); currPos += yyleng; return NEQ;}
+"<"               {yylval.str_val = strdup(yytext); currPos += yyleng; return LT;}
+">"               {yylval.str_val = strdup(yytext); currPos += yyleng; return GT;}
+"<="              {yylval.str_val = strdup(yytext); currPos += yyleng; return LTE;}
+">="              {yylval.str_val = strdup(yytext); currPos += yyleng; return GTE;}
 
 ";"               {currPos += yyleng; return SEMICOLON;}
 ":"               {currPos += yyleng; return COLON;}
@@ -61,7 +62,7 @@ LETTER [a-zA-Z]
 "]"               {currPos += yyleng; return R_SQUARE_BRACKET;}
 ":="              {currPos += yyleng; return ASSIGN;}
 
-{DIGIT}+ {yylval.str_val = strdup(yytext); currPos += yyleng; return NUMBER;}
+{DIGIT}+ {yylval.int_val = atoi(yytext); currPos += yyleng; return NUMBER;}
 
 ("_"[a-zA-Z0-9_]*)|({DIGIT}[a-zA-Z0-9_]*) {printf("Error at line %d, column %d: identifier \"%s\" must begin with a letter\n", currLine, currPos, yytext); exit(1);}
 
