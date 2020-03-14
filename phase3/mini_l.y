@@ -30,11 +30,11 @@
   void replaceString(string&, const string&, const string&);
   bool varDeclared(const vector<string>&, const string&);
   void addLocalVar(const string&);
+  void checkDeclared(const string&);
   void addFunction(const string&);
   bool mainCheck = false;
   extern FILE* yyin;
-  // extern char* file;
-  // map<string, int> symbols;
+  
   vector<string> funcNames;
   vector<string> varNames;
 %}
@@ -993,14 +993,7 @@ TermInner: Var
 
 /* Var */
 Var: Identifier
-    {
-
-       // Error 1 of 9: Using a variable without having first declared it.
-      // if (symbols.find($1->code) == symbols.end()) 
-      // {
-      //   printf("Error - Using an undeclared variable");
-      //   yyerror("Error - Using an undeclared variable");
-      // }
+    {  
       /* 
         Error 6 of 9: 
         Forgetting to specify an array index when using an array variable 
@@ -1017,6 +1010,10 @@ Var: Identifier
       $$ = new nonTerm();
       stringstream ss;
       ss << "_" << $1->code;
+
+      // Error 1 of 9: Using a variable without having first declared it.
+      checkDeclared(ss.str());
+
       $$->code = ss.str();
       $$->var = ss.str();
       $$->isArray = false;
@@ -1161,6 +1158,17 @@ void addLocalVar(const string& var) {
   }
   // var is not in varNames - add to varNames
   varNames.push_back(var);
+}
+
+void checkDeclared(const string& var) {
+  for (unsigned i = 0; i < varNames.size(); ++i) {
+    if (varNames.at(i) == var) {
+      return;
+    }
+  }
+  // var has not yet been declared
+  string err = "used variable \"" + var + "\" was not previously declared.";
+  yyerror(err);
 }
 
 void addFunction(const string& func) {

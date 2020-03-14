@@ -90,7 +90,6 @@ int main(int argc, char **argv) {
   else {
     yyin = stdin;
   }
-  file = strdup(argv[1]);
 
   yyparse();
   return 0;
