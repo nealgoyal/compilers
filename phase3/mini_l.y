@@ -28,8 +28,9 @@
   bool continueCheck (const string &ref);
   void replaceString(string&, const string&, const string&);
   bool varDeclared(const vector<string>&, const string&);
+  bool mainCheck = false;
   extern FILE* yyin;
-  
+
 %}
 %union {
   int int_val;
@@ -89,6 +90,12 @@
 Program: FunctionList
     {
       $$ = new nonTerm();
+      
+      // main declaration check
+      if (!mainCheck) {
+        yyerror("\"main\" function not definied in program.");
+      }
+
       $$->code = $1->code;
       cout << $$->code << endl;
     }
@@ -117,6 +124,12 @@ Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBo
     {
       $$ = new nonTerm();
       stringstream ss;
+
+      // check if function is main
+      if ($2->code == "main") {
+        mainCheck = true;
+      }
+
       ss << "func " << $2->code << endl;
       
       ss << $4->code;
@@ -399,33 +412,16 @@ Statement: Var ASSIGN Expression
       stringstream ss;
       string temp = "";
       for (unsigned i = 0; i < $2->code.length(); ++i) {
-        //find each comma
-        if ($2->code[i] != ',') {
-          temp.push_back($2->code[i]);
-        }
-        else {
-          // reach comma
-          if (temp[temp.length() - 1] == ']') {
-            // FIXME add array var to stream (_ident[2])
-            // - calculate x : [ x ] (str.find('[') => pull substring between index '[' and ']'
-          }
-          else {
-            // add integer var to stream
-            ss << ".< " << temp << endl;
-          }
+        if ($2->code[i] == ',') {
+          ss << ".< " << temp << endl;
           temp = "";
         }
+        else {
+          temp.push_back($2->code[i]);
+        }
       }
-      // add last ident in temp (DO NOT END WITH ENDL)
-      if (temp[temp.length() - 1] == ']') {
-        // FIXME
-        //add array var to stream (_ident[2])
-        // - calculate x : [ x ] (str.find('[') => pull substring between index '[' and ']'
-      }
-      else {
-        // add integer var to stream
-        ss << ".< " << temp;
-      }
+
+      ss << ".< " << temp;
 
       $$->code = ss.str();
     }
@@ -435,33 +431,16 @@ Statement: Var ASSIGN Expression
       stringstream ss;
       string temp = "";
       for (unsigned i = 0; i < $2->code.length(); ++i) {
-        //find each comma
-        if ($2->code[i] != ',') {
-          temp.push_back($2->code[i]);
-        }
-        else {
-          // reach comma
-          if (temp[temp.length() - 1] == ']') {
-            //add array var to stream (_ident[2])
-            // - calculate x : [ x ] (str.find('[') => pull substring between index '[' and ']'
-          }
-          else {
-            // add integer var to stream
-            ss << ".> " << temp << endl;
-          }
+        if ($2->code[i] == ',') {
+          ss << ".< " << temp << endl;
           temp = "";
         }
+        else {
+          temp.push_back($2->code[i]);
+        }
       }
-      // add last ident in temp (DO NOT END WITH ENDL)
-      if (temp[temp.length() - 1] == ']') {
-        // FIXME
-        //add array var to stream (_ident[2])
-        // - calculate x : [ x ] (str.find('[') => pull substring between index '[' and ']'
-      }
-      else {
-        // add integer var to stream
-        ss << ".> " << temp;
-      }
+
+      ss << ".> " << temp;
 
       $$->code = ss.str();
     }
@@ -589,11 +568,11 @@ Relations: Expression Comp Expression
       if ($3->ret_name != "") {
         ss << $3->code << endl;
         ss << ". " << compResult << endl;
-        ss << $2 << compResult << ", " << firstOp << ", " << $3->ret_name;  
+        ss << $2 << " " << compResult << ", " << firstOp << ", " << $3->ret_name;  
       }
       else {
         ss << ". " << compResult << endl;
-        ss << $2 << compResult << ", " << firstOp << ", " << $3->code;
+        ss << $2 << " " << compResult << ", " << firstOp << ", " << $3->code;
       }
 
       $$->code = ss.str();
@@ -952,13 +931,6 @@ Var: Identifier
     }
   | Identifier L_SQUARE_BRACKET Expression R_SQUARE_BRACKET
     {
-      // cout << $3->code << " : " << $3->ret_name << endl;
-      // Neal's code
-      // $$ = new nonTerm();
-      // stringstream ss;
-      // ss << $1->code << ", " << $3->code;
-      // $$->code = ss.str();
-
       $$ = new nonTerm();
       stringstream ss;
       string index, code = "";
@@ -992,7 +964,7 @@ VarList: Var
     {
       $$ = new nonTerm();
       stringstream ss;
-      ss << $1->var << "," << $3->var;
+      ss << $1->var << "," << $3->code;
       $$->code = ss.str();
 
       if ($1->isArray != $3->isArray) {
