@@ -15,6 +15,7 @@
   #include "stdio.h"
   #include <string>
   #include <vector>
+  #include <map>
   #include <iostream>
   #include <sstream>
   using namespace std;
@@ -30,7 +31,8 @@
   bool varDeclared(const vector<string>&, const string&);
   bool mainCheck = false;
   extern FILE* yyin;
-
+  extern char* file;
+  map<string, int> symbols;  
 %}
 %union {
   int int_val;
@@ -38,6 +40,7 @@
   nonTerm* n_term;
 }
 
+%error-verbose
 %start Program
 %token FUNCTION;
 %token BEGIN_PARAMS END_PARAMS;
@@ -101,6 +104,22 @@ Program: FunctionList
     }
   | %empty 
     {
+      // Error 3 of 9: Not defining a main function.
+      if ( symbols.find("main") == symbols.end() ) {
+        printf("Not defining a main function.");
+        yyerror("Not defining a main function.");
+      }
+
+       /* 
+        Error 4 of 9:  
+        Defining a variable more than once (it should also be an error to 
+        declare a variable with the same name as the MINI-L program itself).
+      */
+      if ( symbols.find(file) != symbols.end() ) {
+        printf("Error - program name same as variable");
+        yyerror("Error - program name same as variable");
+      }
+
       $$ = new nonTerm();
       cout << $$->code << endl;
     }
@@ -186,6 +205,7 @@ FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS {
   ;
 FunctionBody: BEGIN_BODY StatementList END_BODY
     {
+      // Error 9 of 9: Using continue statement outside a loop
       if (continueCheck($2->code)) {
         cout << "Error: continue statement not within a loop." << endl;
         exit(1);
@@ -238,6 +258,14 @@ Declaration: IdentifierList COLON INTEGER
     }
   | IdentifierList COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
     {
+      // Error 8 of 9: Declaring an array of size <= 0.
+      string buffer;
+      if ($5 <= 0) {
+        char buffer[100];
+        printf("ERROR - ARRAY size <= 1");
+        yyerror(buffer);
+      }
+
       // FIXME
       $$ = new nonTerm();
       stringstream ss;
@@ -269,6 +297,20 @@ IdentifierList: Identifier {
     }
   ;
 Identifier: IDENT {
+
+    /* 
+        Error 4 of 9:  
+        Defining a variable more than once (it should also be an error to 
+        declare a variable with the same name as the MINI-L program itself).
+    */
+    if (symbols.find($1) != symbols.end()) {
+      printf("Error - Defining a variable more than once");
+      yyerror("Error - Defining a variable more than once");
+    }
+    else {
+      symbols.insert(pair<string,int>($1,0));
+    }
+
     $$ = new nonTerm();
     $$->code = $1;
   }
@@ -864,6 +906,13 @@ Term: TermInner
     }
   | Identifier L_PAREN ExpressionList R_PAREN
     {
+
+      // Error 2 of 9: Calling a function which has not been defined.
+      if (symbols.find($1->code) == symbols.end()) {
+        printf("Error - Calling an undeclared function");
+        yyerror("Error - Calling an undeclared function");
+      }
+
       $$ = new nonTerm();
       string newTemp = makeTemp();
       stringstream ss, sret;
@@ -922,6 +971,26 @@ TermInner: Var
 /* Var */
 Var: Identifier
     {
+
+       // Error 1 of 9: Using a variable without having first declared it.
+      if (symbols.find($1->code) == symbols.end()) 
+      {
+        printf("Error - Using an undeclared variable");
+        yyerror("Error - Using an undeclared variable");
+      }
+      /* 
+        Error 6 of 9: 
+        Forgetting to specify an array index when using an array variable 
+        (i.e., trying to use an array variable as a regular integer variable).
+      */
+
+      // FIXME: no match for ‘operator==’
+
+      // if (symbols.find(($1->code)) == 0) {
+      //   printf("Error - Forgetting to specify an array index when using an array variable ");
+      //   yyerror("Error - Forgetting to specify an array index when using an array variable ");
+      // }
+
       $$ = new nonTerm();
       stringstream ss;
       ss << "_" << $1->code;
@@ -931,6 +1000,27 @@ Var: Identifier
     }
   | Identifier L_SQUARE_BRACKET Expression R_SQUARE_BRACKET
     {
+      // Error 1 of 9: Using a variable without having first declared it.
+      if (symbols.find($1->code) == symbols.end()) 
+      {
+        printf("Error - Using an undeclared variable");
+        yyerror("Error - Using an undeclared variable");
+      } 
+
+      /* 
+        Error 7 of 9: 
+        Specifying an array index when using a regular integer variable 
+        (i.e., trying to use a regular integer variable as an array variable).
+      */
+
+      // FIXME: no match for ‘operator==’
+
+      // if (symbols.find($1->code) == 0) { // FIXME: no match for ‘operator==’
+      //   printf("Error - Using an undeclared variable");
+      //   yyerror("Error - Using an undeclared variable");
+      // }
+
+
       $$ = new nonTerm();
       stringstream ss;
       string index, code = "";
