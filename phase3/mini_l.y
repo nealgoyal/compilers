@@ -30,6 +30,7 @@
   void replaceString(string&, const string&, const string&);
   bool varDeclared(const vector<string>&, const string&);
   void addLocalVar(const string&);
+  void addFunction(const string&);
   bool mainCheck = false;
   extern FILE* yyin;
   // extern char* file;
@@ -96,7 +97,6 @@
 Program: FunctionList
     {
       $$ = new nonTerm();
-      
       // main declaration check
       if (!mainCheck) {
         yyerror("\"main\" function not definied in program.");
@@ -152,6 +152,9 @@ Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBo
         mainCheck = true;
       }
 
+      addFunction($2->code);
+      varNames.clear();
+
       ss << "func " << $2->code << endl;
       
       ss << $4->code;
@@ -169,12 +172,6 @@ Function: FUNCTION Identifier SEMICOLON FunctionParams FunctionLocals FunctionBo
   ;
 FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
     {
-      cout << "varNames: " << endl;
-      for (unsigned i = 0; i < varNames.size(); ++i) {
-        cout << varNames.at(i) << endl;
-      }
-
-
       $$ = new nonTerm();
       stringstream ss;
       
@@ -1164,6 +1161,17 @@ void addLocalVar(const string& var) {
   }
   // var is not in varNames - add to varNames
   varNames.push_back(var);
+}
+
+void addFunction(const string& func) {
+  for (unsigned i = 0; i < funcNames.size(); ++i) {
+    if (funcNames.at(i) == func) {
+      string errorString = "function \"" + func + "\" is multiply-defined.";
+      yyerror(errorString);
+    }
+  }
+  // var is not in varNames - add to varNames
+  funcNames.push_back(func);
 }
 
 int yyerror(string s) {
