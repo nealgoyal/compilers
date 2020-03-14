@@ -15,7 +15,7 @@ https://www.cs.ucr.edu/~cxu009/teaching/CS152-winter20/webpages1/phase1_lexer.ht
 
 **How To Run:**
 ```
-> cd cs 152
+> cd compilers
 > cd phase1
 > make clean
 > make
@@ -31,7 +31,7 @@ https://www.cs.ucr.edu/~cxu009/teaching/CS152-winter20/webpages2/phase2_parser.h
 
 **How To Run:**
 ```
-> cd cs 152
+> cd compilers
 > cd phase2
 > make clean
 > make
@@ -46,11 +46,16 @@ https://www.cs.ucr.edu/~cxu009/teaching/CS152-winter20/webpages3/phase3_code_gen
 
 **How To Run:**
 ```
-> cd cs 152
+> cd compilers
 > cd phase3
 > make clean
 > make
+> echo 5 > input.txt
+> cat tests/fibonacci.min | my_compiler > fibonacci.mil
+> mil_run fibonacci.mil < input.txt
 ```
+Output Expected: 
+8
 
 ## Dependencies
 Install [`flex`](https://github.com/westes/flex) and [`bison`](https://www.gnu.org/software/bison/)
