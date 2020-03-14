@@ -1,5 +1,5 @@
 # Compilers Phase 3 Submission
-# Partners: Cameron Morin & Neal Goyal
+Partners: Cameron Morin & Neal Goyal
 
 We have run through all given test cases. Here is a breakdown of our project completion:
 
