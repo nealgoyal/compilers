@@ -108,22 +108,6 @@ Program: FunctionList
     }
   | %empty 
     {
-      // // Error 3 of 9: Not defining a main function.
-      // if ( symbols.find("main") == symbols.end() ) {
-      //   printf("Not defining a main function.");
-      //   yyerror("Not defining a main function.");
-      // }
-
-       /* 
-        Error 4 of 9:  
-        Defining a variable more than once (it should also be an error to 
-        declare a variable with the same name as the MINI-L program itself).
-      */
-      // if ( symbols.find(file) != symbols.end() ) {
-      //   printf("Error - program name same as variable");
-      //   yyerror("Error - program name same as variable");
-      // }
-
       $$ = new nonTerm();
       cout << $$->code << endl;
     }
@@ -202,7 +186,8 @@ FunctionParams: BEGIN_PARAMS DeclarationList END_PARAMS
       $$ = new nonTerm();
     }
   ;
-FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS {
+FunctionLocals: BEGIN_LOCALS DeclarationList END_LOCALS
+    {
       $$ = new nonTerm();
       $$->code = $2->code;
     }
@@ -307,37 +292,26 @@ Declaration: IdentifierList COLON INTEGER
       $$->ret_name = $1->code; // pass identlist up
     }
   ;
-IdentifierList: Identifier {
+IdentifierList: Identifier
+    {
       $$ = new nonTerm();
       stringstream ss;
       ss << "_" << $1->code;
       $$->code = ss.str();
     }
-  | Identifier COMMA IdentifierList {
+  | Identifier COMMA IdentifierList
+    {
       $$ = new nonTerm();
       stringstream ss;
       ss << "_" << $1->code << "," << $3->code;
       $$->code = ss.str();
     }
   ;
-Identifier: IDENT {
-
-    /* 
-        Error 4 of 9:  
-        Defining a variable more than once (it should also be an error to 
-        declare a variable with the same name as the MINI-L program itself).
-    */
-    // if (symbols.find($1) != symbols.end()) {
-    //   printf("Error - Defining a variable more than once");
-    //   yyerror("Error - Defining a variable more than once");
-    // }
-    // else {
-    //   symbols.insert(pair<string,int>($1,0));
-    // }
-
-    $$ = new nonTerm();
-    $$->code = $1;
-  }
+Identifier: IDENT
+    {
+      $$ = new nonTerm();
+      $$->code = $1;
+    }
   ;
 
 /* Statement */
@@ -608,9 +582,13 @@ RelationExpr: Relations
   | NOT Relations
     {
       $$ = new nonTerm();
+      string notTemp = makeTemp();
 
       stringstream ss;
       ss << $2->code << endl;
+      ss << "! " << notTemp << ", " << $2->ret_name;
+      $$->code = ss.str();
+      $$->ret_name = notTemp;
     }
   ;
 Relations: Expression Comp Expression
@@ -922,11 +900,42 @@ Term: TermInner
     }
   | SUB TermInner
     {
-      // FIXME : same as TermInner but add "! dst, src" after
+      // FIXME : same as TermInner but add "- dst, 0, src" after
       $$ = new nonTerm();
       stringstream ss;
-      ss << "- " << $2->code; // FIXME : evaluate termInner as above and take ret_name and negate
-      $$->code = ss.str();
+      string subTemp = makeTemp();
+
+      if ($2->ret_name == "var") {
+        // is var
+        string newTemp = makeTemp();
+        
+        if ($2->isArray) {
+          if ($2->code.length() > 0) {
+            ss << $2->code << endl;
+          }
+          ss << "=[] " << newTemp << ", " << $2->var << ", " << $2->index << endl;
+
+          $$->var = $2->var;
+          $$->index = $2->index;
+        }
+        else {
+          ss << ". " << newTemp << endl; // create new temp
+          ss << "= " << newTemp << ", " << $2->code << endl;
+        }
+
+        ss << ". " << subTemp << endl;
+        ss << "- " << subTemp << ", 0, " << newTemp;
+
+        $$->code = ss.str();
+        $$->ret_name = subTemp;
+      }
+      else {
+        ss << ". " << subTemp << endl;
+        ss << "- " << subTemp << ", 0, " << $2->code;
+
+        $$->code = ss.str();
+        $$->ret_name = subTemp;
+      }
     }
   | Identifier L_PAREN ExpressionList R_PAREN
     {
@@ -998,13 +1007,6 @@ Var: Identifier
         (i.e., trying to use an array variable as a regular integer variable).
       */
 
-      // FIXME: no match for ‘operator==’
-
-      // if (symbols.find(($1->code)) == 0) {
-      //   printf("Error - Forgetting to specify an array index when using an array variable ");
-      //   yyerror("Error - Forgetting to specify an array index when using an array variable ");
-      // }
-
       $$ = new nonTerm();
       stringstream ss;
       ss << "_" << $1->code;
@@ -1018,27 +1020,12 @@ Var: Identifier
     }
   | Identifier L_SQUARE_BRACKET Expression R_SQUARE_BRACKET
     {
-      // Error 1 of 9: Using a variable without having first declared it.
-      // if (symbols.find($1->code) == symbols.end()) 
-      // {
-      //   printf("Error - Using an undeclared variable");
-      //   yyerror("Error - Using an undeclared variable");
-      // } 
-
       /* 
         Error 7 of 9: 
         Specifying an array index when using a regular integer variable 
         (i.e., trying to use a regular integer variable as an array variable).
       */
-
-      // FIXME: no match for ‘operator==’
-
-      // if (symbols.find($1->code) == 0) { // FIXME: no match for ‘operator==’
-      //   printf("Error - Using an undeclared variable");
-      //   yyerror("Error - Using an undeclared variable");
-      // }
-
-
+      
       $$ = new nonTerm();
       stringstream ss;
       string index, code = "";
@@ -1199,8 +1186,6 @@ int yyerror(string s) {
   extern char *yytext;
 
   cout << "Error line: " << currLine << ": " << s << endl;
-  // cout << "ERROR " << s << " : at symbol " << yytext << " on line " << currLine << ", column " << currPos << endl;
-  // printf("ERROR %s at symbol \"%s\" on line %s, column %s\n"), (s, yytext, currLine, currPos);
   exit(1);
 }
 
