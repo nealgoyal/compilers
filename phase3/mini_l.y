@@ -32,9 +32,10 @@
   void addLocalVar(const string&);
   void checkDeclared(const string&);
   void addFunction(const string&);
+  void checkFuncDeclared(const string&);
   bool mainCheck = false;
   extern FILE* yyin;
-  
+
   vector<string> funcNames;
   vector<string> varNames;
 %}
@@ -931,10 +932,7 @@ Term: TermInner
     {
 
       // Error 2 of 9: Calling a function which has not been defined.
-      // if (symbols.find($1->code) == symbols.end()) {
-      //   printf("Error - Calling an undeclared function");
-      //   yyerror("Error - Calling an undeclared function");
-      // }
+      // checkFuncDeclared($1->code);
 
       $$ = new nonTerm();
       string newTemp = makeTemp();
@@ -1056,6 +1054,9 @@ Var: Identifier
       }
 
       ss << "_" << $1->code;
+
+      // Error 1 of 9: Using a variable without having first declared it.
+      checkDeclared(ss.str());
 
       $$->code = code;
       $$->isArray = true;
@@ -1180,6 +1181,17 @@ void addFunction(const string& func) {
   }
   // var is not in varNames - add to varNames
   funcNames.push_back(func);
+}
+
+void checkFuncDeclared(const string& func) {
+  for (unsigned i = 0; i < funcNames.size(); ++i) {
+    if (funcNames.at(i) == func) {
+      return;
+    }
+  }
+  // var has not yet been declared
+  string err = "called function \"" + func + "\" was not previously declared.";
+  yyerror(err);
 }
 
 int yyerror(string s) {
