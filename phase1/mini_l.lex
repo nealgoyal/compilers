@@ -4,6 +4,57 @@
 
 DIGIT [0-9]
 LETTER [a-zA-Z]
+ID  [a-zA-z]+[a-zA-Z0-9_]*[a-zA-Z0-9]|[a-zA-Z]
+FUNCTION	function
+BEGIN_PARAMS	beginparams
+END_PARAMS	endparams
+BEGIN_LOCALS	beginlocals
+END_LOCALS	endlocals
+BEGIN_BODY	beginbody 
+END_BODY	endbody
+INTEGER		integer
+ARRAY		array
+OF		of
+IF		if
+THEN		then
+ENDIF		endif
+ELSE		else
+WHILE		while
+DO		do
+FOR		for
+BEGINLOOP	beginloop
+ENDLOOP		endloop
+CONTINUE	continue
+READ		read
+WRITE		write
+AND		and
+OR		or
+NOT		not
+TRUE		true
+FALSE		false
+RETURN		return
+
+COMMENT		##.*
+MAIN		main
+SEMICOLON	;
+COLON		:
+COMMA		,
+PLUS    	\+
+MINUS   	-
+MULT    	\*
+DIV     	\/
+MOD		%
+L_PAREN 	\(
+R_PAREN 	\)
+EQUAL		==
+NEQ		<>
+LT		<
+GT		>
+LTE		<=
+GTE		>=
+LSQBRACKET	\[
+RSBRACKET	\]
+ASSIGN		:=
 
 %%
 "function" {printf("FUNCTION\n"); currPos += yyleng;}
