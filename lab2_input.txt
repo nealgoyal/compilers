@@ -1,0 +1,13 @@
+{% comment %} challenge, task 5 {% endcomment %}
+.123
+0.17
+2.171
+5.010
+171.0023
+{% comment %} challenge 2, task 5 {% endcomment %}
+2e7
+2e+7
+2e-7
+2E+102
+5E0
+0.201e+17
